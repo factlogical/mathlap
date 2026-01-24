@@ -1,255 +1,363 @@
 import React, { useEffect, useRef } from 'react';
-import { MessageSquare, FlaskConical, Sparkles, ArrowRight, Zap, Atom, Binary } from 'lucide-react';
+import {
+  Sparkles,
+  Brain,
+  Activity,
+  Zap,
+  Code,
+  FlaskConical,
+  ArrowLeft,
+  Cpu,
+  Atom,
+  Lock
+} from 'lucide-react';
 
 const Home = ({ onNavigate }) => {
-    const canvasRef = useRef(null);
-    const mouseRef = useRef({ x: 0, y: 0 });
+  const canvasRef = useRef(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const animationRef = useRef(null);
 
-    // -- 1. Canvas Animation Engine --
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let particles = [];
-        let animationFrameId;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-        // Configuration
-        const PARTICLE_COUNT = 100;
-        const CONNECTION_DIST = 180;
-        const MOUSE_DIST = 250;
+    let width = 0;
+    let height = 0;
+    let dpr = window.devicePixelRatio || 1;
+    const particles = [];
+    const mathSymbols = ['∑', '∫', '∞', 'π', 'Δ', '∇', 'λ', 'θ', 'ϕ', 'μ', 'σ', 'Ω', '≈', '≠', '≤', '≥'];
 
-        // Resize Handler
-        const handleResize = () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            initParticles();
-        };
+    const PARTICLE_COUNT = 140;
+    const CONNECTION_DIST = 170;
+    const MOUSE_DIST = 210;
+    const MOUSE_FORCE = 0.04;
+    const SPEED_LIMIT = 0.42;
+    const RANDOM_IMPULSE = 0.002;
+    const MIN_SPEED = 0.025;
 
-        // Particle Class
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.4;
-                this.vy = (Math.random() - 0.5) * 0.4;
-                this.size = Math.random() * 2.5 + 1;
-                // Random color from palette
-                const colors = ['#36c2c9', '#8b5cf6', '#10b981', '#f59e0b'];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-            }
+    const resize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      dpr = window.devicePixelRatio || 1;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
+      particles.length = 0;
+      mouseRef.current = { x: width / 2, y: height / 2 };
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const isSymbol = Math.random() < 0.18;
+        const symbol = isSymbol ? mathSymbols[Math.floor(Math.random() * mathSymbols.length)] : null;
+        const symbolSize = isSymbol ? Math.random() * 10 + 14 : 0;
+        const driftSpeed = isSymbol
+          ? Math.random() * 0.012 + 0.006
+          : Math.random() * 0.008 + 0.004;
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.18,
+          vy: (Math.random() - 0.5) * 0.18,
+          radius: Math.random() * 1.7 + 0.5,
+          baseAlpha: Math.random() * 0.35 + 0.25,
+          phase: Math.random() * Math.PI * 2,
+          twinkleSpeed: Math.random() * 0.02 + 0.01,
+          type: isSymbol ? 'symbol' : 'dot',
+          symbol,
+          symbolSize,
+          mass: isSymbol ? 1.1 : 0.8,
+          driftAngle: Math.random() * Math.PI * 2,
+          driftSpeed,
+          driftTurn: (Math.random() - 0.5) * 0.0025,
+          collideRadius: isSymbol ? symbolSize * 0.65 : 0
+        });
+      }
+    };
 
-                // Bounce off edges
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0 || this.y > height) this.vy *= -1;
+    const animate = () => {
+      ctx.fillStyle = 'rgba(2, 4, 9, 0.55)';
+      ctx.fillRect(0, 0, width, height);
 
-                // Mouse interaction
-                const dx = mouseRef.current.x - this.x;
-                const dy = mouseRef.current.y - this.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.phase += p.twinkleSpeed;
+        p.driftAngle += p.driftTurn + (Math.random() - 0.5) * 0.0022;
+        p.vx += Math.cos(p.driftAngle) * p.driftSpeed;
+        p.vy += Math.sin(p.driftAngle) * p.driftSpeed;
 
-                if (distance < MOUSE_DIST) {
-                    const forceDirectionX = dx / distance;
-                    const forceDirectionY = dy / distance;
-                    const force = (MOUSE_DIST - distance) / MOUSE_DIST;
-                    const direction = 1; // attract
-                    const strength = 0.03;
+        // subtle random walk
+        p.vx += (Math.random() - 0.5) * 0.0009;
+        p.vy += (Math.random() - 0.5) * 0.0009;
 
-                    this.vx += forceDirectionX * force * strength * direction;
-                    this.vy += forceDirectionY * force * strength * direction;
-                }
-
-                // Speed limit
-                const maxSpeed = 1.5;
-                const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-                if (speed > maxSpeed) {
-                    this.vx = (this.vx / speed) * maxSpeed;
-                    this.vy = (this.vy / speed) * maxSpeed;
-                }
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = 0.7;
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
+        if (Math.random() < 0.006) {
+          p.vx += (Math.random() - 0.5) * RANDOM_IMPULSE;
+          p.vy += (Math.random() - 0.5) * RANDOM_IMPULSE;
         }
 
-        const initParticles = () => {
-            particles = [];
-            for (let i = 0; i < PARTICLE_COUNT; i++) {
-                particles.push(new Particle());
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        const dx = mouseRef.current.x - p.x;
+        const dy = mouseRef.current.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > 0 && dist < MOUSE_DIST) {
+          const force = (MOUSE_DIST - dist) / MOUSE_DIST;
+          const influence = MOUSE_FORCE * (1 / p.mass);
+          p.vx -= (dx / dist) * force * influence;
+          p.vy -= (dy / dist) * force * influence;
+        }
+
+        p.vx *= 0.996;
+        p.vy *= 0.996;
+
+        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+        if (speed > SPEED_LIMIT) {
+          p.vx = (p.vx / speed) * SPEED_LIMIT;
+          p.vy = (p.vy / speed) * SPEED_LIMIT;
+        }
+        if (speed < MIN_SPEED) {
+          p.vx += (Math.random() - 0.5) * 0.02;
+          p.vy += (Math.random() - 0.5) * 0.02;
+        }
+      }
+
+      // Symbol collisions
+      for (let i = 0; i < particles.length; i++) {
+        const p1 = particles[i];
+        if (p1.type !== 'symbol') continue;
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          if (p2.type !== 'symbol') continue;
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const minDist = p1.collideRadius + p2.collideRadius;
+          if (dist > 0 && dist < minDist) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            const overlap = (minDist - dist) * 0.5;
+            p1.x += nx * overlap;
+            p1.y += ny * overlap;
+            p2.x -= nx * overlap;
+            p2.y -= ny * overlap;
+
+            const dvx = p1.vx - p2.vx;
+            const dvy = p1.vy - p2.vy;
+            const impact = dvx * nx + dvy * ny;
+            if (impact < 0) {
+              const impulse = -impact * 0.6;
+              p1.vx += nx * impulse;
+              p1.vy += ny * impulse;
+              p2.vx -= nx * impulse;
+              p2.vy -= ny * impulse;
             }
-        };
+          }
+        }
+      }
 
-        const animate = () => {
-            ctx.clearRect(0, 0, width, height);
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const p1 = particles[i];
+          const p2 = particles[j];
+          if (p1.type === 'symbol' || p2.type === 'symbol') continue;
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
 
-            // Draw Connections
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
+          if (dist < CONNECTION_DIST) {
+            const opacity = (1 - dist / CONNECTION_DIST) * 0.28;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(80, 170, 255, ${opacity})`;
+            ctx.lineWidth = 0.7;
+            ctx.stroke();
+          }
+        }
+      }
 
-                    if (distance < CONNECTION_DIST) {
-                        const opacity = (1 - distance / CONNECTION_DIST) * 0.5;
-                        ctx.beginPath();
-                        const gradient = ctx.createLinearGradient(
-                            particles[i].x, particles[i].y,
-                            particles[j].x, particles[j].y
-                        );
-                        gradient.addColorStop(0, particles[i].color);
-                        gradient.addColorStop(1, particles[j].color);
-                        ctx.strokeStyle = gradient;
-                        ctx.globalAlpha = opacity;
-                        ctx.lineWidth = 1;
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                        ctx.globalAlpha = 1;
-                    }
-                }
-            }
+      particles.forEach((p) => {
+        const twinkle = (Math.sin(p.phase) + 1) * 0.5;
+        const alpha = Math.min(1, p.baseAlpha + twinkle * 0.45);
 
-            // Update & Draw Particles
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+        if (p.type === 'symbol') {
+          ctx.font = `${p.symbolSize}px "Cairo", "Tajawal", sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = `rgba(170, 225, 255, ${alpha * 0.85})`;
+          ctx.shadowColor = 'rgba(100, 190, 255, 0.6)';
+          ctx.shadowBlur = 12;
+          ctx.fillText(p.symbol, p.x, p.y);
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius * 2.6, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(90, 175, 255, ${alpha * 0.26})`;
+          ctx.fill();
 
-            animationFrameId = requestAnimationFrame(animate);
-        };
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(170, 230, 255, ${alpha})`;
+          ctx.fill();
+        }
+      });
 
-        // Listeners
-        window.addEventListener('resize', handleResize);
-        window.addEventListener('mousemove', (e) => {
-            mouseRef.current = { x: e.clientX, y: e.clientY };
-        });
+      animationRef.current = requestAnimationFrame(animate);
+    };
 
-        // Init
-        handleResize();
-        animate();
+    const handleMouseMove = (event) => {
+      mouseRef.current = { x: event.clientX, y: event.clientY };
+    };
 
-        return () => {
-            window.removeEventListener('resize', handleResize);
-            cancelAnimationFrame(animationFrameId);
-        };
-    }, []);
+    resize();
+    animate();
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', handleMouseMove);
 
-    // -- 2. UI Component --
-    return (
-        <div className="home-container">
-            {/* Background Canvas */}
-            <canvas
-                ref={canvasRef}
-                className="home-canvas"
-            />
+    return () => {
+      cancelAnimationFrame(animationRef.current);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
 
-            {/* Gradient Overlays */}
-            <div className="home-gradient-overlay" />
-            <div className="home-radial-glow" />
+  return (
+    <div dir="rtl" className="landing-root">
+      <canvas ref={canvasRef} className="landing-canvas" />
+      <div className="landing-overlay landing-overlay--blue" />
+      <div className="landing-overlay landing-overlay--violet" />
 
-            {/* Content Container */}
-            <div className="home-content">
+      <div className="landing-content">
+        <section className="landing-hero">
+          <div className="landing-badge landing-fade">
+            <Sparkles className="h-4 w-4" />
+            <span>الجيل القادم من الرياضيات التفاعلية</span>
+          </div>
 
-                {/* Hero Section */}
-                <div className="hero-section">
-                    <div className="hero-badge">
-                        <Sparkles size={14} />
-                        <span>Next-Gen Math AI</span>
-                    </div>
+          <h1 className="landing-title landing-rise">
+            <span className="landing-title-main">أطلق العنان</span>
+            <span className="landing-title-accent">للحدس الرياضي</span>
+          </h1>
 
-                    <h1 className="hero-title">
-                        <span className="hero-title-line">UNLEASH</span>
-                        <span className="hero-title-line hero-title-gradient">MATHEMATICAL</span>
-                        <span className="hero-title-line">INTUITION</span>
-                    </h1>
+          <p className="landing-subtitle landing-fade">
+            استكشف عالم الرياضيات الخفي عبر الذكاء الاصطناعي التحادثي للرسم البياني
+            والتصورات الغامرة رباعية الأبعاد، مدعومة بنماذج توليدية متقدمة.
+          </p>
 
-                    <p className="hero-description">
-                        Explore the unseen universe of mathematics. From conversational AI plotting
-                        to immersive 4D visualizations, powered by advanced generative models.
-                    </p>
-
-                    {/* Feature Pills */}
-                    <div className="hero-features">
-                        <div className="feature-pill">
-                            <Zap size={14} />
-                            <span>Real-time Plotting</span>
-                        </div>
-                        <div className="feature-pill">
-                            <Atom size={14} />
-                            <span>4D Visualization</span>
-                        </div>
-                        <div className="feature-pill">
-                            <Binary size={14} />
-                            <span>AI-Powered</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Navigation Cards */}
-                <div className="nav-cards-grid">
-
-                    {/* Card 1: Chat */}
-                    <button
-                        onClick={() => onNavigate('chat')}
-                        className="nav-card nav-card-chat"
-                    >
-                        <div className="nav-card-glow nav-card-glow-chat" />
-
-                        <div className="nav-card-icon nav-card-icon-chat">
-                            <MessageSquare size={28} />
-                        </div>
-
-                        <h3 className="nav-card-title">AI Chat Assistant</h3>
-                        <p className="nav-card-desc">
-                            Ask questions, solve equations, and generate complex plots using natural language.
-                        </p>
-
-                        <div className="nav-card-action nav-card-action-chat">
-                            <span>Start Chatting</span>
-                            <ArrowRight size={16} className="nav-card-arrow" />
-                        </div>
-                    </button>
-
-                    {/* Card 2: Lab */}
-                    <button
-                        onClick={() => onNavigate('lab')}
-                        className="nav-card nav-card-lab"
-                    >
-                        <div className="nav-card-glow nav-card-glow-lab" />
-
-                        <div className="nav-card-icon nav-card-icon-lab">
-                            <FlaskConical size={28} />
-                        </div>
-
-                        <h3 className="nav-card-title">Interactive Laboratory</h3>
-                        <p className="nav-card-desc">
-                            Dive into real-time simulations: Linear Algebra, Animation DSL, 4D Hypercubes, and more.
-                        </p>
-
-                        <div className="nav-card-action nav-card-action-lab">
-                            <span>Enter Lab</span>
-                            <ArrowRight size={16} className="nav-card-arrow" />
-                        </div>
-                    </button>
-
-                </div>
+          <div className="landing-pills landing-fade">
+            <div className="landing-pill">
+              <Zap className="h-4 w-4" />
+              <span>رسم فوري في الوقت الفعلي</span>
             </div>
-
-            {/* Footer */}
-            <div className="home-footer">
-                Powered by Gemini & Plotly â€¢ Math Agent Demo
+            <div className="landing-pill">
+              <Brain className="h-4 w-4" />
+              <span>مدعوم بالذكاء الاصطناعي</span>
             </div>
-        </div>
-    );
+            <div className="landing-pill">
+              <Activity className="h-4 w-4" />
+              <span>تصورات رباعية الأبعاد</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="landing-cards">
+          <button
+            type="button"
+            onClick={() => onNavigate?.('chat')}
+            className="landing-card landing-card--chat"
+          >
+            <div className="landing-card-inner">
+              <div className="landing-card-content">
+                <h3 className="landing-card-title">مساعد الدردشة الذكي</h3>
+                <p className="landing-card-desc">
+                  اطرح الأسئلة، حل المعادلات، وأنشئ رسومات بيانية معقدة باستخدام اللغة الطبيعية.
+                </p>
+                <span className="landing-card-action landing-card-action--chat">
+                  ابدأ المحادثة
+                  <ArrowLeft className="h-4 w-4" />
+                </span>
+              </div>
+              <div className="landing-card-icon landing-card-icon--chat">
+                <Code className="h-7 w-7" />
+              </div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onNavigate?.('lab')}
+            className="landing-card landing-card--lab"
+          >
+            <div className="landing-card-inner">
+              <div className="landing-card-content">
+                <h3 className="landing-card-title">المختبر التفاعلي</h3>
+                <p className="landing-card-desc">
+                  للحركة، الأسطح رباعية الأبعاد، والمزيد. انغمس في المحاكاة الفورية: الجبر الخطي و DSL.
+                </p>
+                <span className="landing-card-action landing-card-action--lab">
+                  ادخل المختبر
+                  <ArrowLeft className="h-4 w-4" />
+                </span>
+              </div>
+              <div className="landing-card-icon landing-card-icon--lab">
+                <FlaskConical className="h-7 w-7" />
+              </div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onNavigate?.('neural')}
+            className="landing-card landing-card--cs"
+          >
+            <div className="landing-card-inner">
+              <div className="landing-card-content">
+                <div className="landing-card-badge">Available</div>
+                <h3 className="landing-card-title">Computer Science Lab</h3>
+                <p className="landing-card-desc">
+                  Neural Network Lab is live. Algorithms, graphs, and systems labs are coming soon.
+                </p>
+                <span className="landing-card-action landing-card-action--cs">
+                  Open Neural Network Lab
+                  <ArrowLeft className="h-4 w-4" />
+                </span>
+              </div>
+              <div className="landing-card-icon landing-card-icon--cs">
+                <Cpu className="h-7 w-7" />
+              </div>
+            </div>
+          </button>
+
+          <div className="landing-card landing-card--physics landing-card--locked" aria-disabled="true">
+            <div className="landing-card-inner">
+              <div className="landing-card-content">
+                <div className="landing-card-badge landing-card-badge--locked">Locked</div>
+                <h3 className="landing-card-title">Physics Labs</h3>
+                <p className="landing-card-desc">
+                  Motion, fields, waves, and relativity labs are coming later.
+                </p>
+                <span className="landing-card-action landing-card-action--physics">
+                  Locked
+                  <Lock className="h-4 w-4" />
+                </span>
+              </div>
+              <div className="landing-card-icon landing-card-icon--physics">
+                <Atom className="h-7 w-7" />
+              </div>
+            </div>
+          </div>
+
+        </section>
+      </div>
+    </div>
+  );
 };
 
 export default Home;

@@ -1,5 +1,5 @@
 import React from "react";
-import { MessageSquare, FlaskConical, ChevronLeft, LayoutDashboard, Home } from "lucide-react";
+import { MessageSquare, FlaskConical, ChevronLeft, LayoutDashboard, Home, Brain } from "lucide-react";
 
 export default function Sidebar({
     isOpen,
@@ -63,6 +63,13 @@ export default function Sidebar({
                     isActive={activeView === 'lab'}
                     isCollapsed={!isOpen}
                     onClick={() => onNavigate('lab')}
+                />
+                <NavItem
+                    icon={<Brain size={20} />}
+                    label="Computer Science Lab"
+                    isActive={activeView === 'neural'}
+                    isCollapsed={!isOpen}
+                    onClick={() => onNavigate('neural')}
                 />
             </nav>
 

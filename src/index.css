@@ -1453,6 +1453,1122 @@ textarea {
     z-index: 10;
 }
 
+/* ===== NEURAL PLAYGROUND ===== */
+.neural-shell {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px;
+    color: #e5e7eb;
+    min-height: 0;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+    direction: rtl;
+    background:
+        radial-gradient(600px 300px at 20% 10%, rgba(99, 102, 241, 0.12), transparent 65%),
+        radial-gradient(600px 300px at 80% 20%, rgba(139, 92, 246, 0.1), transparent 70%),
+        linear-gradient(135deg, rgba(10, 15, 30, 0.9), rgba(8, 12, 24, 0.95));
+}
+
+.neural-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.neural-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.neural-subtitle {
+    font-size: 0.9rem;
+    color: #cbd5f5;
+    margin-top: 4px;
+}
+
+.neural-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.neural-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.neural-icon-btn:hover {
+    border-color: rgba(99, 102, 241, 0.5);
+    background: rgba(99, 102, 241, 0.15);
+}
+
+.neural-grid {
+    flex: 1;
+    min-height: 640px;
+    display: grid;
+    grid-template-columns: 260px minmax(0, 2.1fr) 400px;
+    gap: 16px;
+}
+
+.neural-panel {
+    background: rgba(15, 23, 42, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 16px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    min-height: 0;
+}
+
+.neural-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: auto;
+}
+
+.neural-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.neural-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f1f5f9;
+}
+
+.neural-section-header--split {
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.neural-section-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.neural-tag {
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #c7d2fe;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    background: rgba(99, 102, 241, 0.12);
+}
+
+.neural-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(15, 23, 42, 0.7);
+    flex-shrink: 0;
+}
+
+.neural-mode-btn {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(226, 232, 240, 0.7);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.neural-mode-btn:hover {
+    color: #f8fafc;
+    background: rgba(148, 163, 184, 0.15);
+}
+
+.neural-mode-btn.active {
+    color: #f8fafc;
+    border-color: rgba(99, 102, 241, 0.6);
+    background: rgba(99, 102, 241, 0.2);
+    box-shadow: 0 8px 18px rgba(79, 70, 229, 0.25);
+}
+
+.neural-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.neural-preset {
+    width: 100%;
+    text-align: right;
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    transition: all 0.25s ease;
+}
+
+.neural-preset.active {
+    border-color: rgba(99, 102, 241, 0.6);
+    background: rgba(99, 102, 241, 0.2);
+}
+
+.neural-preset-icon {
+    font-size: 1.8rem;
+}
+
+.neural-preset-body h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #f8fafc;
+}
+
+.neural-preset-body p {
+    font-size: 0.72rem;
+    color: rgba(226, 232, 240, 0.7);
+    margin-bottom: 6px;
+}
+
+.neural-preset-arch {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: #c7d2fe;
+    font-family: var(--font-mono);
+}
+
+.neural-custom {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(99, 102, 241, 0.12));
+    border-radius: 14px;
+    padding: 14px;
+    border: 1px solid rgba(139, 92, 246, 0.4);
+}
+
+.neural-slider-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.neural-slider-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #e2e8f0;
+}
+
+.neural-slider-wrap {
+    position: relative;
+}
+
+.neural-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(to right, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.6));
+    outline: none;
+}
+
+.neural-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25), 0 6px 16px rgba(99, 102, 241, 0.5);
+    cursor: pointer;
+}
+
+.neural-slider-bubble {
+    position: absolute;
+    top: -32px;
+    transform: translateX(-50%);
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #8b5cf6;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 10px 24px rgba(139, 92, 246, 0.4);
+}
+
+.neural-architecture-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.7);
+    font-size: 0.75rem;
+    color: #e2e8f0;
+}
+
+.neural-chip {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+    font-family: var(--font-mono);
+}
+
+.neural-chip--accent {
+    background: rgba(168, 85, 247, 0.2);
+    color: #c4b5fd;
+}
+
+.neural-chip--output {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+}
+
+.neural-apply-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4);
+}
+
+.neural-dataset {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.neural-dataset.active {
+    border-color: rgba(99, 102, 241, 0.6);
+    background: rgba(99, 102, 241, 0.2);
+}
+
+.neural-dataset-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.neural-dataset-icon {
+    font-size: 1.4rem;
+}
+
+.neural-dataset-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.neural-dataset-level {
+    font-size: 0.7rem;
+    color: rgba(226, 232, 240, 0.7);
+}
+
+.neural-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.neural-visual-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.neural-placeholder {
+    flex: 1;
+    min-height: 340px;
+    border-radius: 16px;
+    border: 1px dashed rgba(148, 163, 184, 0.3);
+    background: rgba(15, 23, 42, 0.45);
+    position: relative;
+    overflow: hidden;
+}
+
+.neural-network {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    min-height: 380px;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    background: rgba(8, 12, 24, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+.neural-network-svg {
+    width: 100%;
+    height: 100%;
+    shape-rendering: geometricPrecision;
+}
+
+.neural-node-label {
+    font-size: 0.78rem;
+    fill: #e2e8f0;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.neural-plot-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.neural-plot {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.neural-plot--boundary {
+    flex: 1;
+    height: 100%;
+    min-height: 240px;
+}
+
+.neural-plot--loss {
+    height: 100%;
+    min-height: 110px;
+}
+
+.neural-tooltip {
+    position: fixed;
+    z-index: 60;
+    min-width: 240px;
+    max-width: 300px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(34, 211, 238, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(16px);
+    color: #e2e8f0;
+    pointer-events: none;
+}
+
+.neural-tooltip-title {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: #22d3ee;
+    margin-bottom: 6px;
+}
+
+.neural-tooltip-equation {
+    font-size: 0.9rem;
+    color: #f8fafc;
+    font-family: 'Times New Roman', serif;
+    margin-bottom: 6px;
+}
+
+.neural-tooltip-sum {
+    color: #4ade80;
+    font-weight: 700;
+}
+
+.neural-tooltip-bias {
+    color: #facc15;
+    font-weight: 700;
+}
+
+.neural-tooltip-values {
+    font-size: 0.72rem;
+    color: rgba(226, 232, 240, 0.75);
+    display: grid;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.neural-tooltip-output {
+    color: #f8fafc;
+    font-weight: 700;
+}
+
+.neural-tooltip-activation {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: rgba(226, 232, 240, 0.7);
+}
+
+.neural-tooltip-pill {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(34, 211, 238, 0.15);
+    color: #67e8f9;
+    font-weight: 600;
+}
+
+.neural-placeholder-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.4;
+}
+
+.neural-placeholder-content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+    color: #cbd5f5;
+}
+
+.neural-placeholder-content h4 {
+    font-size: 1rem;
+    color: #f8fafc;
+}
+
+.neural-placeholder--small {
+    min-height: 220px;
+}
+
+.neural-math-hint {
+    font-size: 0.8rem;
+    color: rgba(226, 232, 240, 0.7);
+    border-left: 2px solid rgba(99, 102, 241, 0.6);
+    padding-left: 10px;
+}
+
+.neural-problem {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: auto;
+    min-height: 0;
+}
+
+.neural-card {
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.neural-card--boundary {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.neural-card--metrics {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(20, 83, 45, 0.2));
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.neural-card--training {
+    flex-shrink: 0;
+    max-height: 300px;
+    overflow: auto;
+}
+
+.neural-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.neural-metrics p {
+    font-size: 0.75rem;
+    color: rgba(226, 232, 240, 0.7);
+    margin-bottom: 6px;
+}
+
+.neural-metrics span {
+    font-size: 1.1rem;
+    color: #f8fafc;
+    font-weight: 700;
+}
+
+.neural-training {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.neural-train-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    color: #fff;
+    border: none;
+}
+
+.neural-train-btn.play {
+    background: linear-gradient(90deg, #22c55e, #10b981);
+    box-shadow: 0 12px 24px rgba(16, 185, 129, 0.4);
+}
+
+.neural-train-btn.pause {
+    background: linear-gradient(90deg, #f59e0b, #f97316);
+    box-shadow: 0 12px 24px rgba(249, 115, 22, 0.4);
+}
+
+.neural-reset-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+}
+
+.neural-speed {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: rgba(226, 232, 240, 0.7);
+}
+
+.neural-speed > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #e2e8f0;
+}
+
+.neural-loss {
+    height: 150px;
+    max-height: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+    min-height: 0;
+    flex-shrink: 0;
+}
+
+.neural-loss-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 12px;
+    min-height: 0;
+    align-items: stretch;
+    height: 100%;
+    overflow: hidden;
+}
+
+.neural-loss-metrics {
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.6);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.neural-plot-frame .js-plotly-plot,
+.neural-plot-frame .plot-container,
+.neural-plot-frame .svg-container {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    max-height: 100%;
+    position: absolute !important;
+    inset: 0;
+}
+
+.neural-plot-frame .modebar,
+.neural-plot-frame .modebar-container {
+    display: none !important;
+}
+
+.neural-loss-metrics p {
+    font-size: 0.7rem;
+    color: rgba(226, 232, 240, 0.7);
+    margin-bottom: 4px;
+}
+
+.neural-loss-metrics span {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.neural-dataset-toolbar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    margin-inline-start: auto;
+    flex-shrink: 0;
+}
+
+.neural-dataset-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.neural-dataset-btn.active,
+.neural-dataset-btn:hover {
+    border-color: rgba(99, 102, 241, 0.6);
+    background: rgba(99, 102, 241, 0.2);
+}
+
+.neural-coach {
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    font-size: 0.78rem;
+    color: #e2e8f0;
+    line-height: 1.4;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+}
+
+.neural-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: rgba(226, 232, 240, 0.7);
+}
+
+.neural-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1200px) {
+    .neural-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .neural-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .neural-header-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+}
+
+/* ===== LANDING PAGE (RTL) ===== */
+.landing-root {
+    position: relative;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: radial-gradient(circle at top, #050a14 0%, #03060e 55%, #02050b 100%);
+    color: #e2e8f0;
+    font-family: "Cairo", "Tajawal", var(--font-sans);
+}
+
+.landing-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.62;
+}
+
+.landing-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.landing-overlay--blue {
+    background: radial-gradient(circle at 70% 20%, rgba(56, 189, 248, 0.1), transparent 65%);
+}
+
+.landing-overlay--violet {
+    background: radial-gradient(circle at 20% 10%, rgba(139, 92, 246, 0.12), transparent 68%);
+}
+
+.landing-content {
+    position: relative;
+    z-index: 2;
+    padding-bottom: 5rem;
+}
+
+.landing-hero {
+    text-align: center;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 80px 24px 36px;
+}
+
+.landing-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(14, 116, 144, 0.2);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #7dd3fc;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 12px 24px rgba(14, 116, 144, 0.25);
+    backdrop-filter: blur(8px);
+}
+
+.landing-title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: clamp(2.8rem, 7vw, 5.2rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin: 24px 0 0;
+}
+
+.landing-title-main {
+    color: #e2f2ff;
+}
+
+.landing-title-accent {
+    background: linear-gradient(90deg, #a78bfa, #38bdf8, #7dd3fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.landing-subtitle {
+    margin-top: 18px;
+    font-size: 1.1rem;
+    line-height: 1.85;
+    color: #cbd5e1;
+}
+
+.landing-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.landing-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+}
+
+.landing-pill svg {
+    color: #38bdf8;
+}
+
+.landing-cards {
+    max-width: 1020px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.landing-card {
+    position: relative;
+    border-radius: 26px;
+    padding: 30px 34px;
+    text-align: right;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 28px 60px rgba(3, 10, 24, 0.45);
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(10, 17, 34, 0.95));
+}
+
+.landing-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(125, 211, 252, 0.35);
+    box-shadow: 0 34px 70px rgba(3, 10, 24, 0.55);
+}
+
+.landing-card-inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.landing-card-content {
+    flex: 1;
+}
+
+.landing-card-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: #f8fafc;
+}
+
+.landing-card-desc {
+    color: #cbd5e1;
+    line-height: 1.75;
+    margin: 0;
+}
+
+.landing-card-action {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.landing-card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.landing-card-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a7f3d0;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    margin-bottom: 10px;
+}
+
+.landing-card--chat {
+    background: linear-gradient(135deg, rgba(7, 33, 48, 0.92), rgba(9, 24, 42, 0.96));
+    border-color: rgba(56, 189, 248, 0.25);
+}
+
+.landing-card-action--chat {
+    color: #38bdf8;
+}
+
+.landing-card-icon--chat {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.18);
+    box-shadow: 0 14px 30px rgba(56, 189, 248, 0.18);
+}
+
+.landing-card--lab {
+    background: linear-gradient(135deg, rgba(35, 24, 74, 0.95), rgba(23, 22, 55, 0.98));
+    border-color: rgba(168, 85, 247, 0.28);
+}
+
+.landing-card-action--lab {
+    color: #c084fc;
+}
+
+.landing-card-icon--lab {
+    color: #c084fc;
+    background: rgba(168, 85, 247, 0.18);
+    box-shadow: 0 14px 30px rgba(168, 85, 247, 0.18);
+}
+
+.landing-card--neural {
+    background: linear-gradient(135deg, rgba(8, 44, 52, 0.95), rgba(8, 35, 46, 0.98));
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.landing-card-action--neural {
+    color: #34d399;
+}
+
+.landing-card-icon--neural {
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.2);
+    box-shadow: 0 14px 30px rgba(16, 185, 129, 0.2);
+}
+
+.landing-card--cs {
+    background: linear-gradient(135deg, rgba(20, 33, 73, 0.95), rgba(16, 24, 55, 0.98));
+    border-color: rgba(99, 102, 241, 0.35);
+}
+
+.landing-card-action--cs {
+    color: #a5b4fc;
+}
+
+.landing-card-icon--cs {
+    color: #a5b4fc;
+    background: rgba(99, 102, 241, 0.2);
+    box-shadow: 0 14px 30px rgba(99, 102, 241, 0.2);
+}
+
+.landing-card--physics {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+    border-color: rgba(148, 163, 184, 0.35);
+}
+
+.landing-card-action--physics {
+    color: #cbd5e1;
+}
+
+.landing-card-icon--physics {
+    color: #cbd5e1;
+    background: rgba(148, 163, 184, 0.18);
+    box-shadow: 0 14px 30px rgba(148, 163, 184, 0.18);
+}
+
+.landing-card--locked {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.landing-card-badge--locked {
+    color: #e2e8f0;
+    background: rgba(148, 163, 184, 0.12);
+    border-color: rgba(148, 163, 184, 0.35);
+}
+
+.landing-fade {
+    animation: landing-fade 0.9s ease-out both;
+}
+
+.landing-rise {
+    animation: landing-rise 1s ease-out both;
+}
+
+@keyframes landing-fade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes landing-rise {
+    from {
+        opacity: 0;
+        transform: translateY(28px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .landing-hero {
+        padding-top: 64px;
+    }
+
+    .landing-subtitle {
+        font-size: 1rem;
+    }
+
+    .landing-card-inner {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .landing-card-icon {
+        width: 56px;
+        height: 56px;
+    }
+}
+
 /* Responsive */
 @media (max-width: 640px) {
     .hero-title {

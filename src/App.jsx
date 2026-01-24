@@ -5,6 +5,7 @@ import { Loader2, Send, MessageSquare } from "lucide-react";
 import MathLab from "./lab/MathLab";
 import Home from "./pages/Home";
 import AppShell from "./components/layout/AppShell";
+import NeuralPlayground from "./pages/NeuralPlayground";
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
@@ -18,6 +19,7 @@ export default function App() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [spec, setSpec] = useState(null);
+  const [apiError, setApiError] = useState("");
 
   // Persist history
   useEffect(() => {
@@ -36,6 +38,7 @@ export default function App() {
     // Switch to chat if not already
     if (activeView !== 'chat') setActiveView('chat');
 
+    setApiError("");
     setLoading(true);
 
     // Update History
@@ -48,6 +51,8 @@ export default function App() {
       setSpec(result);
     } catch (err) {
       console.error(err);
+      setSpec(null);
+      setApiError("API server is offline. Start it from /server with: npm start");
     } finally {
       setLoading(false);
     }
@@ -71,7 +76,15 @@ export default function App() {
       activeView={activeView}
       onNavigate={setActiveView}
       history={history}
-      title={activeView === 'lab' ? "Math Lab" : activeView === 'chat' ? "Agent Chat" : "Home"}
+      title={
+        activeView === 'lab'
+          ? "Math Lab"
+          : activeView === 'chat'
+            ? "Agent Chat"
+            : activeView === 'neural'
+              ? "Computer Science Lab"
+              : "Home"
+      }
       onHistoryClick={(text) => {
         setPrompt(text);
         setActiveView('chat');
@@ -82,6 +95,11 @@ export default function App() {
       {/* VIEW: LAB */}
       {activeView === 'lab' && (
         <MathLab />
+      )}
+
+      {/* VIEW: NEURAL */}
+      {activeView === 'neural' && (
+        <NeuralPlayground />
       )}
 
       {/* VIEW: CHAT */}
@@ -107,6 +125,9 @@ export default function App() {
                     </div>
                     <h3 className="text-lg font-semibold mb-2 text-[var(--text-primary)]">Welcome to Math Agent</h3>
                     <p className="text-sm text-[var(--text-muted)]">Enter a mathematical query below to generate visualizations and analysis.</p>
+                    {apiError && (
+                      <p className="text-xs text-orange-300 mt-3">{apiError}</p>
+                    )}
                   </div>
                 </div>
               )}

@@ -21,8 +21,10 @@ export async function interpretPromptToJson(promptText, mode = "chat", retries =
             return data.json ?? null;
 
         } catch (err) {
-            console.warn(`Attempt ${i + 1} failed: ${err.message}`);
-            if (i === retries - 1) throw err;
+            const message = err?.message || "Unknown error";
+            console.warn(`Attempt ${i + 1} failed: ${message}`);
+            const fatal = /failed to fetch|err_connection_refused/i.test(message);
+            if (i === retries - 1 || fatal) throw err;
             await new Promise(r => setTimeout(r, 1000 * (i + 1)));
         }
     }
