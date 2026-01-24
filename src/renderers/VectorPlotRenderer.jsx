@@ -15,16 +15,34 @@ const VectorPlotRenderer = ({ spec, payload: directPayload }) => {
     const [showLabels, setShowLabels] = useState(true);
     const [scale, setScale] = useState(1.0);
     const [is3D, setIs3D] = useState(data.view?.dimension === '3D');
+    const externalControls = data.ui?.vectorControls;
+    const isControlled = Boolean(externalControls);
+    const controls = isControlled
+        ? {
+            showHeadToTail: externalControls.showHeadToTail,
+            showResultant: externalControls.showResultant,
+            showLabels: externalControls.showLabels,
+            scale: externalControls.scale,
+            is3D: externalControls.is3D
+        }
+        : {
+            showHeadToTail,
+            showResultant,
+            showLabels,
+            scale,
+            is3D
+        };
 
     // Auto-detect initial settings from spec
     useEffect(() => {
+        if (isControlled) return;
         if (data.view?.show_head_to_tail) setShowHeadToTail(true);
         if (data.view?.dimension === '3D') setIs3D(true);
         if (data.math?.kind === 'vector_operation') {
             setShowHeadToTail(true);
             setShowResultant(true);
         }
-    }, [data.view, data.math?.kind]);
+    }, [data.view, data.math?.kind, isControlled]);
 
     // --- DATA PROCESSING ---
     const { plotData, plotLayout } = useMemo(() => {
@@ -68,14 +86,14 @@ const VectorPlotRenderer = ({ spec, payload: directPayload }) => {
                 // Usually Head-to-Tail means v + w + ... 
                 // So v starts at 0. w starts at v_end.
                 // However, user might supply explicit starts. We override if toggle is ON.
-                if (showHeadToTail) {
+                if (controls.showHeadToTail) {
                     start = [...currentTip];
                 }
 
                 const comps = v.components || [0, 0];
-                const dx = (comps[0] || 0) * scale;
-                const dy = (comps[1] || 0) * scale;
-                const dz = (comps[2] || 0) * scale;
+                const dx = (comps[0] || 0) * controls.scale;
+                const dy = (comps[1] || 0) * controls.scale;
+                const dz = (comps[2] || 0) * controls.scale;
 
                 const end = [start[0] + dx, start[1] + dy, start[2] + dz];
 
@@ -88,7 +106,7 @@ const VectorPlotRenderer = ({ spec, payload: directPayload }) => {
                     realStart: start,
                     realEnd: end,
                     magnitude: Math.sqrt(dx * dx + dy * dy + dz * dz).toFixed(2),
-                    componentsLabel: `(${dx.toFixed(1)}, ${dy.toFixed(1)}${is3D ? `, ${dz.toFixed(1)}` : ''})`
+                    componentsLabel: `(${dx.toFixed(1)}, ${dy.toFixed(1)}${controls.is3D ? `, ${dz.toFixed(1)}` : ''})`
                 });
 
                 // Update tip for next vector
@@ -97,16 +115,23 @@ const VectorPlotRenderer = ({ spec, payload: directPayload }) => {
 
             // 3. Optional Resultant (Head-to-Tail Sum)
             // Vector from Origin -> Final Tip
-            if (showHeadToTail && showResultant && processedVectors.length > 0) {
-                // Resultant R = Sum(v_i)
-                // Start: [0,0,0], End: currentTip
-                // Only if we haven't already included explicit resultant in the list
+            if (controls.showResultant && processedVectors.length > 0) {
+                const sum = vectorList.reduce((acc, v) => {
+                    const comps = v.components || [0, 0, 0];
+                    acc[0] += comps[0] || 0;
+                    acc[1] += comps[1] || 0;
+                    acc[2] += comps[2] || 0;
+                    return acc;
+                }, [0, 0, 0]);
+                const scaledSum = [sum[0] * controls.scale, sum[1] * controls.scale, sum[2] * controls.scale];
+                const resultantEnd = controls.showHeadToTail ? currentTip : scaledSum;
+
                 processedVectors.push({
                     label: "Resultant",
                     realStart: [0, 0, 0],
-                    realEnd: currentTip,
-                    magnitude: Math.sqrt(currentTip[0] ** 2 + currentTip[1] ** 2 + currentTip[2] ** 2).toFixed(2),
-                    componentsLabel: `(${currentTip[0].toFixed(1)}, ${currentTip[1].toFixed(1)})`,
+                    realEnd: resultantEnd,
+                    magnitude: Math.sqrt(resultantEnd[0] ** 2 + resultantEnd[1] ** 2 + resultantEnd[2] ** 2).toFixed(2),
+                    componentsLabel: `(${resultantEnd[0].toFixed(1)}, ${resultantEnd[1].toFixed(1)}${controls.is3D ? `, ${resultantEnd[2].toFixed(1)}` : ''})`,
                     isResultant: true,
                     color: '#facc15' // Yellow
                 });
@@ -129,7 +154,7 @@ const VectorPlotRenderer = ({ spec, payload: directPayload }) => {
                 const text = `${v.label}<br>|${v.label}|=${v.magnitude}<br>${v.componentsLabel}`;
                 const color = v.color || (idx === 0 ? '#38bdf8' : '#ef4444'); // Blue then Red default
 
-                if (is3D) {
+                if (controls.is3D) {
                     // 3D: Line + Marker (Cone-ish)
                     traces.push({
                         type: 'scatter3d',
@@ -170,7 +195,7 @@ const VectorPlotRenderer = ({ spec, payload: directPayload }) => {
                         arrowsize: 1.2,
                         arrowwidth: 3,
                         arrowcolor: color,
-                        text: showLabels ? v.label : "",
+                        text: controls.showLabels ? v.label : "",
                         font: { color: color, size: 14, weight: 'bold' },
                         startstandoff: 0
                     });
@@ -209,7 +234,8 @@ const VectorPlotRenderer = ({ spec, payload: directPayload }) => {
                     zaxis: { range: [zMin, zMax], backgroundcolor: "rgba(0,0,0,0)", gridcolor: '#334155' },
                     camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
                 },
-                annotations: is3D ? [] : annotations
+                dragmode: controls.is3D ? 'orbit' : 'pan',
+                annotations: controls.is3D ? [] : annotations
             };
 
             return { plotData: traces, plotLayout: layout };
@@ -218,44 +244,53 @@ const VectorPlotRenderer = ({ spec, payload: directPayload }) => {
             console.error("VectorCalc Error:", err);
             return { plotData: [], plotLayout: {}, error: err.message };
         }
-    }, [data, showHeadToTail, showResultant, showLabels, scale, is3D]);
+    }, [
+        data,
+        controls.showHeadToTail,
+        controls.showResultant,
+        controls.showLabels,
+        controls.scale,
+        controls.is3D
+    ]);
 
 
     return (
         <div className="w-full h-full relative">
             {/* UI Controls Overlay */}
-            <div className="absolute top-2 left-2 z-10 bg-slate-900/80 backdrop-blur border border-slate-700 p-2 rounded text-xs flex flex-col gap-2 shadow-xl">
-                <div className="font-bold border-b border-slate-700 pb-1 mb-1 text-slate-300">Vector Tools</div>
+            {!isControlled && (
+                <div className="absolute top-2 left-2 z-10 bg-slate-900/80 backdrop-blur border border-slate-700 p-2 rounded text-xs flex flex-col gap-2 shadow-xl">
+                    <div className="font-bold border-b border-slate-700 pb-1 mb-1 text-slate-300">Vector Tools</div>
 
-                <label className="flex items-center gap-2 cursor-pointer hover:text-white">
-                    <input type="checkbox" checked={showHeadToTail} onChange={e => setShowHeadToTail(e.target.checked)} />
-                    Head-to-Tail
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer hover:text-white">
-                    <input type="checkbox" checked={showResultant} onChange={e => setShowResultant(e.target.checked)} />
-                    Show Sum
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer hover:text-white">
-                    <input type="checkbox" checked={showLabels} onChange={e => setShowLabels(e.target.checked)} />
-                    Labels
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer hover:text-white">
-                    <input type="checkbox" checked={is3D} onChange={e => setIs3D(e.target.checked)} />
-                    3D Mode
-                </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:text-white">
+                        <input type="checkbox" checked={showHeadToTail} onChange={e => setShowHeadToTail(e.target.checked)} />
+                        Head-to-Tail
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:text-white">
+                        <input type="checkbox" checked={showResultant} onChange={e => setShowResultant(e.target.checked)} />
+                        Show Sum
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:text-white">
+                        <input type="checkbox" checked={showLabels} onChange={e => setShowLabels(e.target.checked)} />
+                        Labels
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:text-white">
+                        <input type="checkbox" checked={is3D} onChange={e => setIs3D(e.target.checked)} />
+                        3D Mode
+                    </label>
 
-                <div className="flex flex-col gap-1 mt-1">
-                    <span className="text-slate-400">Scale: {scale}x</span>
-                    <input type="range" min="0.5" max="3" step="0.1" value={scale} onChange={e => setScale(Number(e.target.value))} className="w-full h-1 bg-slate-600 rounded-lg appearance-none cursor-pointer" />
+                    <div className="flex flex-col gap-1 mt-1">
+                        <span className="text-slate-400">Scale: {scale}x</span>
+                        <input type="range" min="0.5" max="3" step="0.1" value={scale} onChange={e => setScale(Number(e.target.value))} className="w-full h-1 bg-slate-600 rounded-lg appearance-none cursor-pointer" />
+                    </div>
                 </div>
-            </div>
+            )}
 
             <SafePlot
                 data={plotData}
                 layout={plotLayout}
                 style={{ width: "100%", height: "100%" }}
                 useResizeHandler={true}
-                config={{ responsive: true, displayModeBar: false }}
+                config={{ responsive: true, displayModeBar: controls.is3D, scrollZoom: true }}
             />
         </div>
     );

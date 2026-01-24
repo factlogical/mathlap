@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import SceneRouter from "./renderers/SceneRouter.jsx";
 import { interpretPromptToJson } from "./agent/interpret.js";
-import { Loader2, Send, MessageSquare } from "lucide-react";
 import MathLab from "./lab/MathLab";
 import Home from "./pages/Home";
 import AppShell from "./components/layout/AppShell";
 import NeuralPlayground from "./pages/NeuralPlayground";
+import ChatAgent from "./pages/ChatAgent";
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
@@ -20,6 +19,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [spec, setSpec] = useState(null);
   const [apiError, setApiError] = useState("");
+  const [chatMessages, setChatMessages] = useState([]);
 
   // Persist history
   useEffect(() => {
@@ -39,6 +39,7 @@ export default function App() {
     if (activeView !== 'chat') setActiveView('chat');
 
     setApiError("");
+    setChatMessages((prev) => [...prev, { role: "user", text }]);
     setLoading(true);
 
     // Update History
@@ -49,12 +50,21 @@ export default function App() {
     try {
       const result = await interpretPromptToJson(text);
       setSpec(result);
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "assistant", text: describeSpec(result) }
+      ]);
     } catch (err) {
       console.error(err);
       setSpec(null);
       setApiError("API server is offline. Start it from /server with: npm start");
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "assistant", text: "تعذر الاتصال بالخادم. شغّل السيرفر أولاً." }
+      ]);
     } finally {
       setLoading(false);
+      setPrompt("");
     }
   };
 
@@ -104,62 +114,37 @@ export default function App() {
 
       {/* VIEW: CHAT */}
       {activeView === 'chat' && (
-        <div className="chat-layout">
-          {/* Visualization Stage */}
-          <div className="chat-stage">
-            {loading && (
-              <div className="stage-overlay">
-                <Loader2 className="w-12 h-12 text-[var(--primary)] animate-spin mb-4" />
-                <p className="text-sm text-[var(--primary)] font-medium">Processing query...</p>
-              </div>
-            )}
-
-            <div className="chat-stage-body">
-              {spec ? (
-                <SceneRouter spec={spec} />
-              ) : (
-                <div className="h-full flex items-center justify-center">
-                  <div className="chat-placeholder">
-                    <div className="chat-placeholder-icon">
-                      <MessageSquare size={28} />
-                    </div>
-                    <h3 className="text-lg font-semibold mb-2 text-[var(--text-primary)]">Welcome to Math Agent</h3>
-                    <p className="text-sm text-[var(--text-muted)]">Enter a mathematical query below to generate visualizations and analysis.</p>
-                    {apiError && (
-                      <p className="text-xs text-orange-300 mt-3">{apiError}</p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Input Console */}
-          <div className="input-row">
-            <textarea
-              className="chat-input"
-              rows={2}
-              placeholder="Enter mathematical query (e.g., 'plot sin(x) from -10 to 10')..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleGenerate();
-                }
-              }}
-            />
-            <button
-              onClick={() => handleGenerate()}
-              disabled={loading || !prompt.trim()}
-              className="btn btn-primary"
-            >
-              <Send size={16} />
-              RUN
-            </button>
-          </div>
-        </div>
+        <ChatAgent
+          spec={spec}
+          loading={loading}
+          prompt={prompt}
+          onPromptChange={setPrompt}
+          onSend={() => handleGenerate()}
+          apiError={apiError}
+          messages={chatMessages}
+          onSuggestion={(text) => handleGenerate(text)}
+        />
       )}
     </AppShell>
   );
+}
+
+function describeSpec(spec) {
+  const data = spec?.payload || spec?.params || spec || {};
+  const math = data.math || {};
+  const view = data.view || {};
+  const dim = view.dimension || (view.type === "surface" ? "3D" : "2D");
+  const kind = math.kind || "plot";
+  const expr = math.expression || "";
+
+  if (kind.includes("vector")) {
+    return `Drawing vectors in ${dim}. You can inspect dot product and magnitude in Analysis.`;
+  }
+  if (data.transform?.op === "partial_derivative") {
+    return `Plotted derivative of ${expr} in ${dim}.`;
+  }
+  if (expr) {
+    return `Plotted ${expr} in ${dim}.`;
+  }
+  return "Visualization is ready.";
 }

@@ -26,6 +26,7 @@ const ScalarPlotRenderer = ({ spec, payload: directPayload }) => {
     const [xRange, setXRange] = useState(data.domain?.x || [-10, 10]);
     const [yRange, setYRange] = useState(data.domain?.y || [-10, 10]);
     const [dragMode, setDragMode] = useState("pan");
+    const [derivedExpression, setDerivedExpression] = useState(null);
 
     const debounceRef = useRef(null);
     const mathSpecRef = useRef(null);
@@ -50,9 +51,24 @@ const ScalarPlotRenderer = ({ spec, payload: directPayload }) => {
             setError(null);
             const { math: mathSpec, transform, view, domain } = data;
             const kind = mathSpec.kind;
+            let derivativeExpr = null;
 
             if (kind === 'scalar_field' || kind === 'function_1d') {
-                const result = computeScalarField(mathSpec, transform, view, { ...domain, x: xRange, y: yRange });
+                if (transform?.op === 'partial_derivative' && transform.variable) {
+                    try {
+                        derivativeExpr = math.derivative(mathSpec.expression, transform.variable).toString();
+                    } catch (e) {
+                        derivativeExpr = null;
+                    }
+                }
+                setDerivedExpression(derivativeExpr);
+                const result = computeScalarField(
+                    mathSpec,
+                    transform,
+                    view,
+                    { ...domain, x: xRange, y: yRange },
+                    derivativeExpr
+                );
                 setPlotData(result);
             } else if (kind === 'sequence' || (data.mode === 'recurrence')) {
                 const result = computeRecurrence(data);
@@ -150,6 +166,8 @@ const ScalarPlotRenderer = ({ spec, payload: directPayload }) => {
     }
 
     // Neon Layout
+    const is3D = data.view?.dimension === '3D' || data.view?.type === 'line3d';
+    const tightLayout = Boolean(data.ui?.tight);
     const layout = {
         autosize: true,
         paper_bgcolor: 'rgba(0,0,0,0)',
@@ -159,7 +177,7 @@ const ScalarPlotRenderer = ({ spec, payload: directPayload }) => {
             family: "'JetBrains Mono', 'Consolas', monospace",
             size: 11
         },
-        margin: { l: 50, r: 30, t: 30, b: 50 },
+        margin: tightLayout ? { l: 20, r: 12, t: 16, b: 20 } : { l: 50, r: 30, t: 30, b: 50 },
         xaxis: {
             range: xRange,
             gridcolor: "rgba(255, 255, 255, 0.05)",
@@ -181,9 +199,9 @@ const ScalarPlotRenderer = ({ spec, payload: directPayload }) => {
             spikethickness: 1
         },
         showlegend: false,
-        dragmode: dragMode,
+        dragmode: is3D ? 'orbit' : dragMode,
         hovermode: 'x unified',
-        ...(data.view?.dimension === '3D' || data.plot_type === 'surface' ? {
+        ...(is3D || data.plot_type === 'surface' ? {
             scene: {
                 xaxis: { gridcolor: '#1e293b' },
                 yaxis: { gridcolor: '#1e293b' },
@@ -203,7 +221,7 @@ const ScalarPlotRenderer = ({ spec, payload: directPayload }) => {
                     style={{ width: "100%", height: "100%" }}
                     useResizeHandler={true}
                     config={{
-                        displayModeBar: false,
+                        displayModeBar: is3D,
                         scrollZoom: true,
                         doubleClick: 'reset',
                         responsive: true
@@ -215,6 +233,9 @@ const ScalarPlotRenderer = ({ spec, payload: directPayload }) => {
             {data.math?.expression && (
                 <div className="function-2d-equation">
                     <span style={{ color: '#00ffff' }}>f(x) = {data.math.expression}</span>
+                    {data.transform?.op === 'partial_derivative' && derivedExpression && (
+                        <div style={{ color: '#f97316', marginTop: 4 }}>f'(x) = {derivedExpression}</div>
+                    )}
                 </div>
             )}
 
@@ -250,14 +271,17 @@ const ScalarPlotRenderer = ({ spec, payload: directPayload }) => {
 
 // --- COMPUTE ENGINES ---
 
-function computeScalarField(mathSpec, transform, view, domain) {
+function computeScalarField(mathSpec, transform, view, domain, derivativeExpressionOverride = null) {
     let expression = mathSpec.expression;
+    const baseExpression = expression;
 
     // Apply Transformation
     if (transform?.op === 'partial_derivative' && transform.variable) {
         try {
-            const d = math.derivative(expression, transform.variable);
-            expression = d.toString();
+            const d = derivativeExpressionOverride
+                ? derivativeExpressionOverride
+                : math.derivative(expression, transform.variable).toString();
+            expression = d;
         } catch (e) {
             throw new Error(`Failed to compute derivative: ${e.message}`);
         }
@@ -265,6 +289,8 @@ function computeScalarField(mathSpec, transform, view, domain) {
 
     const node = math.parse(expression);
     const compiled = node.compile();
+    const baseNode = transform?.op === 'partial_derivative' ? math.parse(baseExpression) : null;
+    const compiledBase = baseNode ? baseNode.compile() : null;
 
     // Add buffer for smoother infinite panning
     const rawXDist = domain.x || [-10, 10];
@@ -280,6 +306,7 @@ function computeScalarField(mathSpec, transform, view, domain) {
         const xArr = [];
         const yArr = [];
         const glowY = [];
+        const baseY = [];
         const step = (xDist[1] - xDist[0]) / N;
 
         for (let i = 0; i <= N; i++) {
@@ -295,6 +322,16 @@ function computeScalarField(mathSpec, transform, view, domain) {
                 yArr.push(null);
                 glowY.push(null);
             }
+
+            if (compiledBase) {
+                try {
+                    let yBase = compiledBase.evaluate({ ...LIMITED_SCOPE, x });
+                    if (!isFinite(yBase) || isNaN(yBase)) yBase = null;
+                    baseY.push(yBase);
+                } catch {
+                    baseY.push(null);
+                }
+            }
         }
 
         // 3D Line
@@ -307,6 +344,37 @@ function computeScalarField(mathSpec, transform, view, domain) {
                 mode: 'lines',
                 line: { color: '#00ffff', width: 6 }
             }];
+        }
+
+        if (compiledBase) {
+            return [
+                {
+                    x: xArr,
+                    y: baseY,
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: { color: 'rgba(148, 163, 184, 0.6)', width: 2, dash: 'dot' },
+                    hoverinfo: 'skip',
+                    showlegend: false
+                },
+                {
+                    x: xArr,
+                    y: glowY,
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: { color: 'rgba(0, 255, 255, 0.2)', width: 10 },
+                    hoverinfo: 'skip',
+                    showlegend: false
+                },
+                {
+                    x: xArr,
+                    y: yArr,
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: { color: '#00ffff', width: 3 },
+                    hovertemplate: '<b>x</b>: %{x:.3f}<br><b>f\'(x)</b>: %{y:.3f}<extra></extra>'
+                }
+            ];
         }
 
         // 2D Neon Line (no spline for better infinite canvas performance)
