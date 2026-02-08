@@ -150,10 +150,358 @@ You MUST strictly follow the JSON schema provided in the User's message.
 Do not output markdown code blocks. Output raw JSON only.
 `;
 
-function buildMessages(userText, mode) {
+const VALID_MODES = new Set(["chat", "lab_animation", "lab_chat", "derivative_chat"]);
+const VALID_HIGHLIGHTS = new Set(["secant", "tangent", "triangle", "plane", "normal", "surface"]);
+
+function normalizeArabicText(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/[ًٌٍَُِّْـ]/g, "")
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه");
+}
+
+function cleanFunctionExpression(raw) {
+  if (!raw) return null;
+  let expr = String(raw).trim();
+  expr = expr.replace(/^f\(x\)\s*=\s*/i, "");
+  expr = expr.replace(/^y\s*=\s*/i, "");
+  expr = expr.replace(/[“”"']/g, "").trim();
+  if (!expr) return null;
+  if (expr.length > 120) expr = expr.slice(0, 120).trim();
+  return expr || null;
+}
+
+function inferDerivativeFunctionAtPoint(text) {
+  const original = String(text || "").trim();
+  if (!original) return null;
+
+  const normalizedArabic = normalizeArabicText(original);
+  const arabicMatch = normalizedArabic.match(/مشتق(?:ه)?\s+(.+?)\s+عند\s+(-?\d+(?:\.\d+)?)/i);
+  if (arabicMatch) {
+    const func = cleanFunctionExpression(arabicMatch[1]);
+    const a = Number(arabicMatch[2]);
+    if (func && Number.isFinite(a)) return { func, a };
+  }
+
+  const englishMatch = original.match(/derivative\s+of\s+(.+?)\s+at\s+(-?\d+(?:\.\d+)?)/i);
+  if (englishMatch) {
+    const func = cleanFunctionExpression(englishMatch[1]);
+    const a = Number(englishMatch[2]);
+    if (func && Number.isFinite(a)) return { func, a };
+  }
+
+  return null;
+}
+function infer3DFunction(text) {
+  const original = String(text || "").trim();
+  if (!original) return null;
+
+  const matches = [
+    original.match(/(?:z|f\(x,\s*y\))\s*=\s*(.+)$/i),
+    original.match(/(?:surface|plot3d|3d)\s+(.+)$/i)
+  ];
+
+  for (const match of matches) {
+    if (!match) continue;
+    let func3D = String(match[1] || "").trim();
+    func3D = func3D.replace(/[��"']/g, "").trim();
+    if (!func3D) continue;
+    if (func3D.length > 120) func3D = func3D.slice(0, 120).trim();
+    if (/x/i.test(func3D) && /y/i.test(func3D)) return func3D;
+  }
+  return null;
+}
+
+function asksFor3DMode(text) {
+  const original = String(text || "").toLowerCase();
+  const normalizedArabic = normalizeArabicText(text);
+  return (
+    /\b3d\b|surface|tangent plane|normal vector|partial derivative/.test(original) ||
+    /(ثلاثي|سطح|مستوى|عمودي|مشتقات جزئيه)/.test(normalizedArabic)
+  );
+}
+
+function asksFor2DMode(text) {
+  const original = String(text || "").toLowerCase();
+  const normalizedArabic = normalizeArabicText(text);
+  return (
+    /\b2d\b|secant|tangent line/.test(original) ||
+    /(ثنائي|القاطع|المماس)/.test(normalizedArabic)
+  );
+}
+
+function asksSecantToTangent(text) {
+  const original = String(text || "").toLowerCase();
+  const normalizedArabic = normalizeArabicText(text);
+
+  const arabicTransition =
+    /القاطع/.test(normalizedArabic) &&
+    /مماس|المماس/.test(normalizedArabic) &&
+    /ورني|وريني|ارني|اريني|كيف|يصير|يتحول/.test(normalizedArabic);
+
+  const englishTransition =
+    /secant/.test(original) &&
+    /tangent/.test(original) &&
+    /(show|how|animate|turn|become)/.test(original);
+
+  return arabicTransition || englishTransition;
+}
+
+function normalizeAction(action) {
+  if (!action || typeof action !== "object") return null;
+  const type = typeof action.type === "string" ? action.type.trim().toLowerCase() : "";
+  if (!type) return null;
+  const params = action.params && typeof action.params === "object" ? action.params : {};
+  return { type, params };
+}
+
+function hasVisualIntent(text = "") {
+  return /(ارسم|غيّر|غير|بدّل|بدل|جرّب|جرب|اعرض|خلّ|خل|ضع|حرك|حرّك|سوي|سوّي|plot|draw|show|set)/i.test(String(text));
+}
+
+function isJustAskingExample(text = "") {
+  return /(اعطني مثال|مثال فقط|اشرح|وضح|فسر|ما معنى|ما هو)/i.test(String(text)) && !hasVisualIntent(text);
+}
+
+function buildAnimateAction(context = {}) {
+  const h = Number(context?.h);
+  const from = Number.isFinite(h) && Math.abs(h) >= 0.01 ? h : 1;
+  const to = from < 0 ? -0.01 : 0.01;
+  return {
+    type: "animate",
+    params: { from, to, duration: 2500 }
+  };
+}
+
+function stripEmojis(text) {
+  if (typeof text !== "string") return text;
+  return text
+    .replace(/\p{Extended_Pictographic}/gu, "")
+    .replace(/\uFE0F/gu, "")
+    .trim();
+}
+
+function normalizeSuggestedActions(raw) {
+  if (!Array.isArray(raw)) return [];
+  const output = [];
+  for (const entry of raw) {
+    if (!entry || typeof entry !== "object") continue;
+    const action = normalizeAction(entry.action);
+    if (!action) continue;
+    const label = typeof entry.label === "string" && entry.label.trim()
+      ? stripEmojis(entry.label)
+      : "طبّق على الرسم";
+    output.push({ label, action });
+    if (output.length >= 5) break;
+  }
+  return output;
+}
+
+function inferPointSuggestionsForFunc(funcText) {
+  const func = String(funcText || "").toLowerCase();
+  if (/sin|cos/.test(func)) return [0, 1.57];
+  if (/tan/.test(func)) return [0, 0.79];
+  return [-1, 1];
+}
+
+function formatSuggestionPoint(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "0";
+  if (Math.abs(n - Math.round(n)) < 1e-9) return String(Math.round(n));
+  return n.toFixed(2);
+}
+
+function buildContextQuickActions(applyAction, context = {}) {
+  if (!applyAction) return [];
+
+  if (applyAction.type === "change_function_3d") {
+    const b = Number(context?.b);
+    const b0 = Number.isFinite(b) ? b : 0;
+    const b1 = Number((b0 + 1).toFixed(2));
+    const b2 = Number((b0 - 1).toFixed(2));
+    return [
+      {
+        label: "Apply 3D surface",
+        action: applyAction
+      },
+      {
+        label: "Show tangent plane",
+        action: {
+          type: "multi_step",
+          params: {
+            steps: [
+              { action: applyAction, delay: 0 },
+              { action: { type: "toggle", params: { element: "plane", show: true } }, delay: 50 }
+            ]
+          }
+        }
+      },
+      {
+        label: "Show normal vector",
+        action: {
+          type: "multi_step",
+          params: {
+            steps: [
+              { action: applyAction, delay: 0 },
+              { action: { type: "toggle", params: { element: "normal", show: true } }, delay: 50 }
+            ]
+          }
+        }
+      },
+      {
+        label: `Try b=${formatSuggestionPoint(b1)}`,
+        action: {
+          type: "multi_step",
+          params: {
+            steps: [
+              { action: applyAction, delay: 0 },
+              { action: { type: "set_b", params: { b: b1 } }, delay: 50 }
+            ]
+          }
+        }
+      },
+      {
+        label: `Try b=${formatSuggestionPoint(b2)}`,
+        action: {
+          type: "multi_step",
+          params: {
+            steps: [
+              { action: applyAction, delay: 0 },
+              { action: { type: "set_b", params: { b: b2 } }, delay: 50 }
+            ]
+          }
+        }
+      }
+    ];
+  }
+
+  if (applyAction.type !== "change_function") return [];
+
+  const h = Number(context?.h);
+  const from = Number.isFinite(h) && Math.abs(h) >= 0.01 ? h : 1;
+  const to = from < 0 ? -0.01 : 0.01;
+  const points = inferPointSuggestionsForFunc(applyAction?.params?.func);
+
+  const applyStep = { action: applyAction, delay: 0 };
+
+  return [
+    {
+      label: "طبّق الدالة على الرسم",
+      action: applyAction
+    },
+    {
+      label: "Show tangent (على الدالة)",
+      action: {
+        type: "multi_step",
+        params: {
+          steps: [
+            applyStep,
+            {
+              action: { type: "toggle", params: { element: "tangent", show: true } },
+              delay: 50
+            }
+          ]
+        }
+      }
+    },
+    {
+      label: "Animate (على الدالة)",
+      action: {
+        type: "multi_step",
+        params: {
+          steps: [
+            applyStep,
+            {
+              action: { type: "animate", params: { from, to, duration: 2500 } },
+              delay: 50
+            }
+          ]
+        }
+      }
+    },
+    {
+      label: `Try a=${formatSuggestionPoint(points[0])}`,
+      action: {
+        type: "multi_step",
+        params: {
+          steps: [
+            applyStep,
+            {
+              action: { type: "move_point", params: { a: points[0] } },
+              delay: 50
+            }
+          ]
+        }
+      }
+    },
+    {
+      label: `Try a=${formatSuggestionPoint(points[1])}`,
+      action: {
+        type: "multi_step",
+        params: {
+          steps: [
+            applyStep,
+            {
+              action: { type: "move_point", params: { a: points[1] } },
+              delay: 50
+            }
+          ]
+        }
+      }
+    }
+  ];
+}
+
+function buildDerivativeChatPrompt(context = {}) {
+  const safe = context && typeof context === "object" ? context : {};
+  const currentMode = String(safe.mode || "2D").toUpperCase() === "3D" ? "3D" : "2D";
+
+  const formatNumber = (value) => {
+    const n = Number(value);
+    return Number.isFinite(n) ? n.toFixed(4) : "not_computed";
+  };
+
+  return `
+You are a derivative tutor for an interactive studio with two views:
+- 2D mode: secant/tangent/triangle for f(x)
+- 3D mode: surface z=f(x,y), tangent plane, normal vector at (a,b)
+
+Current context:
+- mode: ${currentMode}
+- 2D: f(x)=${String(safe.func ?? "x^2")}, a=${formatNumber(safe.a)}, h=${formatNumber(safe.h)}, secant=${formatNumber(safe.slope_secant)}, tangent=${formatNumber(safe.slope_tangent)}
+- 3D: f(x,y)=${String(safe.func3D ?? "x^2 + y^2")}, a=${formatNumber(safe.a)}, b=${formatNumber(safe.b)}, z0=${formatNumber(safe.z0)}, fx=${formatNumber(safe.fx)}, fy=${formatNumber(safe.fy)}
+
+Output JSON only with this schema:
+{
+  "explanation": "string",
+  "steps": "string (optional)",
+  "hint": "string (optional)",
+  "action": {
+    "type": "set_mode|change_function|change_function_3d|set_h|move_point|set_b|animate|toggle|set_range",
+    "params": {}
+  } | null,
+  "highlight": "secant|tangent|triangle|plane|normal|surface|null",
+  "suggested_actions": [{ "label": "string", "action": { "type": "...", "params": {} } }] (optional),
+  "quick_actions": [{ "label": "string", "action": { "type": "...", "params": {} } }] (optional)
+}
+
+Behavior rules:
+- If user asks for 3D surface/partial derivatives/tangent plane, prefer action type "change_function_3d".
+- If user asks to switch view explicitly, return action type "set_mode" with mode "2D" or "3D".
+- For 3D point movement, use "move_point" for a and "set_b" for b.
+- For 3D visibility controls, use toggle element: "surface", "plane", "normal".
+- For 2D secant-to-tangent animation, use action type "animate".
+- Never output markdown.
+`;
+}
+
+function buildMessages(userText, mode, context = {}) {
   let prompt = SYSTEM_PROMPT;
   if (mode === 'lab_animation') prompt = ANIMATION_LAB_PROMPT;
   if (mode === 'lab_chat') prompt = LAB_CHAT_PROMPT;
+  if (mode === 'derivative_chat') prompt = buildDerivativeChatPrompt(context);
 
   return [
     { role: "system", content: prompt },
@@ -167,19 +515,26 @@ app.get("/api/health", (_req, res) => {
 
 app.post("/api/interpret", async (req, res) => {
   try {
-    const promptText = String(req.body?.prompt ?? "").trim();
+    const promptText = String(req.body?.prompt ?? req.body?.message ?? "").trim();
     const mode = String(req.body?.mode ?? "chat");
+    const context = req.body?.context && typeof req.body.context === "object"
+      ? req.body.context
+      : {};
 
     if (!promptText) {
       return res.status(400).json({ error: "Please enter a prompt" });
+    }
+
+    if (!VALID_MODES.has(mode)) {
+      return res.status(400).json({ error: `Invalid mode: ${mode}` });
     }
 
     console.log(`📡 Sending request to OpenAI (${MODEL_NAME}) [Mode: ${mode}]...`);
 
     const completion = await openai.chat.completions.create({
       model: MODEL_NAME,
-      messages: buildMessages(promptText, mode),
-      temperature: 0.1,
+      messages: buildMessages(promptText, mode, context),
+      temperature: mode === "derivative_chat" ? 0.3 : 0.1,
       response_format: { type: "json_object" } // Enforce JSON mode
     });
 
@@ -195,9 +550,90 @@ app.post("/api/interpret", async (req, res) => {
       if (!parsedData || typeof parsedData !== "object") {
         throw new Error("Result is not a valid JSON object");
       }
-    } catch (parseError) {
+    } catch {
       console.error("❌ JSON Parse Error:", text);
       return res.status(502).json({ error: "Failed to parse OpenAI response", raw: text });
+    }
+
+    if (mode === "derivative_chat") {
+      const is3DContext = String(context?.mode || "2D").toUpperCase() === "3D";
+      const transitionAsked = asksSecantToTangent(promptText);
+      const inferredChange2D = inferDerivativeFunctionAtPoint(promptText);
+      const inferredFunc3D = infer3DFunction(promptText);
+      const wants3D = asksFor3DMode(promptText);
+      const wants2D = asksFor2DMode(promptText);
+
+      let action = normalizeAction(parsedData.action);
+
+      if (inferredFunc3D && (!action || action.type !== "change_function_3d")) {
+        action = {
+          type: "change_function_3d",
+          params: {
+            func3D: inferredFunc3D,
+            a: Number.isFinite(Number(context?.a)) ? Number(context.a) : 0,
+            b: Number.isFinite(Number(context?.b)) ? Number(context.b) : 0
+          }
+        };
+      } else if (transitionAsked && !wants3D && !is3DContext) {
+        action = action?.type === "animate" ? action : buildAnimateAction(context);
+      } else if (inferredChange2D && (!action || action.type !== "change_function")) {
+        action = {
+          type: "change_function",
+          params: inferredChange2D
+        };
+      } else if (wants3D && !action) {
+        action = { type: "set_mode", params: { mode: "3D" } };
+      } else if (wants2D && !action) {
+        action = { type: "set_mode", params: { mode: "2D" } };
+      }
+
+      const rawHighlight = typeof parsedData.highlight === "string"
+        ? parsedData.highlight.toLowerCase()
+        : "";
+      let highlight = VALID_HIGHLIGHTS.has(rawHighlight) ? rawHighlight : null;
+      if (!highlight) {
+        if (action?.type === "change_function") highlight = "tangent";
+        if (action?.type === "animate") highlight = "secant";
+        if (action?.type === "change_function_3d") highlight = "surface";
+        if (action?.type === "set_b") highlight = "normal";
+        if (action?.type === "set_mode" && action?.params?.mode === "3D") highlight = "surface";
+      }
+
+      let suggestedActions = normalizeSuggestedActions(parsedData.suggested_actions);
+      const actionType = action?.type || "";
+      const isExampleAction = actionType === "change_function" || actionType === "change_function_3d";
+      if (isExampleAction && isJustAskingExample(promptText)) {
+        suggestedActions = [
+          ...suggestedActions,
+          { label: "طبّق على الرسم", action }
+        ];
+        action = null;
+        highlight = null;
+      }
+
+      const applyFromSuggested = suggestedActions.find((s) =>
+        s.action?.type === "change_function" || s.action?.type === "change_function_3d"
+      )?.action;
+      const applyForContext = applyFromSuggested || (
+        action?.type === "change_function" || action?.type === "change_function_3d" ? action : null
+      );
+      const llmQuickActions = normalizeSuggestedActions(parsedData.quick_actions);
+      const contextQuickActions = applyForContext ? buildContextQuickActions(applyForContext, context) : [];
+      const quickActions = [...llmQuickActions, ...contextQuickActions];
+
+      return res.json({
+        success: true,
+        explanation:
+          typeof parsedData.explanation === "string" && parsedData.explanation.trim()
+            ? stripEmojis(parsedData.explanation)
+            : "I could not parse the request clearly. Please rephrase.",
+        steps: stripEmojis(parsedData.steps),
+        hint: stripEmojis(parsedData.hint),
+        action,
+        highlight,
+        suggested_actions: suggestedActions,
+        quick_actions: quickActions
+      });
     }
 
     // Schema Validation (Zod)
@@ -226,3 +662,4 @@ app.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
   console.log(`🤖 AI Model: ${MODEL_NAME}`);
 });
+

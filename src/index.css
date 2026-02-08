@@ -3331,6 +3331,8 @@ textarea {
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     overflow-x: auto;
+    align-items: stretch;
+    scrollbar-width: thin;
 }
 
 .lab-module-card {
@@ -3344,6 +3346,7 @@ textarea {
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 200px;
+    flex: 0 0 auto;
 }
 
 .epsilon-lab-active .lab-toolbar-enhanced {
@@ -3399,6 +3402,9 @@ textarea {
     flex-direction: column;
     gap: 2px;
     text-align: left;
+    min-width: 0;
+    max-width: 180px;
+    overflow: hidden;
 }
 
 .lab-module-label {
@@ -3406,12 +3412,17 @@ textarea {
     font-weight: 600;
     color: #e2e8f0;
     transition: color 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .lab-module-desc {
     font-size: 0.7rem;
     color: #64748b;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .lab-stage-enhanced {

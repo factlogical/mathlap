@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Square, Box, PlayCircle, Layers, Download, MessageSquare, Sparkles, X, Target } from "lucide-react";
+import { Square, Box, PlayCircle, Layers, Download, MessageSquare, Sparkles, X, Target, Sigma } from "lucide-react";
 import AnimationLabRenderer from "../renderers/lab/AnimationLabRenderer";
 import LinearStudioSVG from "../renderers/lab/LinearStudioSVG";
 import HypercubeRenderer from "../renderers/lab/HypercubeRenderer";
 import ManifoldRenderer from "../renderers/lab/ManifoldRenderer";
 import EpsilonDeltaRenderer from "../renderers/lab/EpsilonDeltaRenderer";
+import DerivativeStudioRenderer from "./DerivativeStudio/DerivativeStudioRenderer";
 
 const LABS = [
     {
@@ -41,14 +42,20 @@ const LABS = [
         icon: Target,
         description: "Interactive limit definition explorer",
         renderer: EpsilonDeltaRenderer
+    },
+    {
+        id: "derivative-studio",
+        label: "Derivative Studio",
+        icon: Sigma,
+        description: "Secant, tangent, and derivative intuition",
+        renderer: DerivativeStudioRenderer
     }
 ];
 
 export default function MathLab() {
     const [activeLab, setActiveLab] = useState("animation");
     const [showAIChat, setShowAIChat] = useState(false);
-
-    const activeLabConfig = LABS.find(lab => lab.id === activeLab);
+    const isStandaloneLab = activeLab === "epsilon-delta" || activeLab === "derivative-studio";
 
     const handleDownload = async () => {
         try {
@@ -124,6 +131,29 @@ export default function MathLab() {
         }
     };
 
+    const renderLab = () => {
+        switch (activeLab) {
+            case "linear":
+                return (
+                    <div className="w-full h-full flex items-center justify-center bg-[var(--panel-2)]">
+                        <LinearStudioSVG matrix={[[1, 0], [0, 1]]} />
+                    </div>
+                );
+            case "hypercube":
+                return <HypercubeRenderer />;
+            case "animation":
+                return <AnimationLabRenderer />;
+            case "manifold":
+                return <ManifoldRenderer />;
+            case "epsilon-delta":
+                return <EpsilonDeltaRenderer spec={epsilonDeltaSpec} />;
+            case "derivative-studio":
+                return <DerivativeStudioRenderer />;
+            default:
+                return <div className="text-slate-300 p-4">اختر مختبرًا من الأعلى.</div>;
+        }
+    };
+
     return (
         <div className={`lab-shell-enhanced ${activeLab === "epsilon-delta" ? "epsilon-lab-active" : ""}`}>
             {/* Toolbar with Lab Tabs */}
@@ -150,18 +180,10 @@ export default function MathLab() {
 
             {/* Main Stage */}
             <div className="lab-stage-enhanced">
-                {activeLab === "linear" && (
-                    <div className="w-full h-full flex items-center justify-center bg-[var(--panel-2)]">
-                        <LinearStudioSVG matrix={[[1, 0], [0, 1]]} />
-                    </div>
-                )}
-                {activeLab === "animation" && <AnimationLabRenderer />}
-                {activeLab === "hypercube" && <HypercubeRenderer />}
-                {activeLab === "manifold" && <ManifoldRenderer />}
-                {activeLab === "epsilon-delta" && <EpsilonDeltaRenderer spec={epsilonDeltaSpec} />}
+                {renderLab()}
 
                 {/* Controls - Distributed Layout */}
-                {activeLab !== "epsilon-delta" && (
+                {!isStandaloneLab && (
                     <>
                         {/* AI Chat Button - Top Left */}
                         <button
@@ -189,7 +211,7 @@ export default function MathLab() {
             </div>
 
             {/* AI Chat Panel */}
-            {showAIChat && activeLab !== "epsilon-delta" && (
+            {showAIChat && !isStandaloneLab && (
                 <div className="ai-chat-box">
                     <div className="ai-chat-header">
                         <div className="ai-avatar-pulse">
