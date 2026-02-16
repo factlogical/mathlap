@@ -51,14 +51,14 @@ export default function ControlPanel({
                     className={state.mode === "2D" ? "active" : ""}
                     onClick={() => onStateChange((prev) => ({ ...prev, mode: "2D" }))}
                 >
-                    2D View
+                    عرض ثنائي الأبعاد
                 </button>
                 <button
                     type="button"
                     className={state.mode === "3D" ? "active" : ""}
                     onClick={() => onStateChange((prev) => ({ ...prev, mode: "3D" }))}
                 >
-                    3D Tangent Plane
+                    المستوى المماسي ثلاثي الأبعاد
                 </button>
             </div>
 
@@ -75,12 +75,12 @@ export default function ControlPanel({
                                 onKeyDown={(event) => event.key === "Enter" && apply2DFunction()}
                                 style={{ flex: 1 }}
                             />
-                            <button type="button" onClick={apply2DFunction}>Apply</button>
+                            <button type="button" onClick={apply2DFunction}>تطبيق</button>
                         </div>
                     </div>
 
                     <div className="presets">
-                        <label>2D Presets</label>
+                        <label>دوال جاهزة 2D</label>
                         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                             {PRESETS_2D.map((preset) => (
                                 <button
@@ -146,7 +146,7 @@ export default function ControlPanel({
                             fontWeight: "bold"
                         }}
                     >
-                        {state.isAnimating ? "Animating..." : "Animate secant -> tangent"}
+                        {state.isAnimating ? "جارٍ التحريك..." : "حرّك القاطع نحو المماس"}
                     </button>
 
                     <div className="toggles">
@@ -158,7 +158,7 @@ export default function ControlPanel({
                                     onStateChange((prev) => ({ ...prev, showSecant: event.target.checked }))
                                 }
                             />
-                            Secant
+                            القاطع
                         </label>
                         <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                             <input
@@ -168,7 +168,7 @@ export default function ControlPanel({
                                     onStateChange((prev) => ({ ...prev, showTangent: event.target.checked }))
                                 }
                             />
-                            Tangent
+                            المماس
                         </label>
                         <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                             <input
@@ -178,22 +178,22 @@ export default function ControlPanel({
                                     onStateChange((prev) => ({ ...prev, showTriangle: event.target.checked }))
                                 }
                             />
-                            Triangle
+                            المثلث
                         </label>
                     </div>
 
                     {data2D && !data2D.error && (
                         <div className="calculations">
-                            <h4>2D Metrics</h4>
+                            <h4>قياسات 2D</h4>
                             <div style={{ fontSize: "0.9em", fontFamily: "monospace" }}>
                                 <div>f(a) = {data2D.fa.toFixed(4)}</div>
                                 <div>f(a + h) = {data2D.fah.toFixed(4)}</div>
-                                <div><strong>Secant slope:</strong> {data2D.slope_secant.toFixed(4)}</div>
+                                <div><strong>ميل القاطع:</strong> {data2D.slope_secant.toFixed(4)}</div>
                                 {data2D.isDerivableAtA && (
-                                    <div><strong>Tangent slope:</strong> {data2D.slope_tangent.toFixed(4)}</div>
+                                    <div><strong>ميل المماس:</strong> {data2D.slope_tangent.toFixed(4)}</div>
                                 )}
                                 {!data2D.isDerivableAtA && (
-                                    <div style={{ color: "#fca5a5" }}>Derivative is not stable at point a.</div>
+                                    <div style={{ color: "#fca5a5" }}>المشتقة غير مستقرة عند النقطة a.</div>
                                 )}
                             </div>
                         </div>
@@ -212,12 +212,12 @@ export default function ControlPanel({
                                 onKeyDown={(event) => event.key === "Enter" && apply3DFunction()}
                                 style={{ flex: 1 }}
                             />
-                            <button type="button" onClick={apply3DFunction}>Apply</button>
+                            <button type="button" onClick={apply3DFunction}>تطبيق</button>
                         </div>
                     </div>
 
                     <div className="presets">
-                        <label>3D Presets</label>
+                        <label>دوال جاهزة 3D</label>
                         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                             {PRESETS_3D.map((expr) => (
                                 <button
@@ -235,7 +235,7 @@ export default function ControlPanel({
                     </div>
 
                     <div className="slider-group">
-                        <label>a (x-point) = {state.a.toFixed(2)}</label>
+                        <label>a (نقطة x) = {state.a.toFixed(2)}</label>
                         <input
                             type="range"
                             min={state.xDomain3D[0]}
@@ -249,7 +249,7 @@ export default function ControlPanel({
                     </div>
 
                     <div className="slider-group">
-                        <label>b (y-point) = {state.b.toFixed(2)}</label>
+                        <label>b (نقطة y) = {state.b.toFixed(2)}</label>
                         <input
                             type="range"
                             min={state.yDomain3D[0]}
@@ -263,7 +263,7 @@ export default function ControlPanel({
                     </div>
 
                     <div className="slider-group">
-                        <label>patch size = {state.patchSize3D.toFixed(2)}</label>
+                        <label>حجم الرقعة = {state.patchSize3D.toFixed(2)}</label>
                         <input
                             type="range"
                             min="0.5"
@@ -285,7 +285,7 @@ export default function ControlPanel({
                                     onStateChange((prev) => ({ ...prev, showSurface3D: event.target.checked }))
                                 }
                             />
-                            Surface
+                            السطح
                         </label>
                         <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                             <input
@@ -295,7 +295,7 @@ export default function ControlPanel({
                                     onStateChange((prev) => ({ ...prev, showPlane3D: event.target.checked }))
                                 }
                             />
-                            Tangent plane
+                            المستوى المماسي
                         </label>
                         <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                             <input
@@ -305,12 +305,12 @@ export default function ControlPanel({
                                     onStateChange((prev) => ({ ...prev, showNormal3D: event.target.checked }))
                                 }
                             />
-                            Normal vector
+                            متجه العمودي
                         </label>
                     </div>
 
                     <div className="presets">
-                        <label>Camera Preset</label>
+                        <label>إعداد الكاميرا</label>
                         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                             {CAMERA_PRESETS.map((preset) => (
                                 <button
@@ -341,12 +341,12 @@ export default function ControlPanel({
 
                     {data3D && !data3D.error && (
                         <div className="calculations">
-                            <h4>3D Metrics</h4>
+                            <h4>قياسات 3D</h4>
                             <div style={{ fontSize: "0.9em", fontFamily: "monospace" }}>
                                 <div>f(a,b) = {data3D.z0.toFixed(4)}</div>
                                 <div>fx(a,b) = {data3D.dfx.toFixed(4)}</div>
                                 <div>fy(a,b) = {data3D.dfy.toFixed(4)}</div>
-                                <div>gradient source: {data3D.source}</div>
+                                <div>مصدر التدرج: {data3D.source}</div>
                             </div>
                         </div>
                     )}
@@ -371,7 +371,7 @@ export default function ControlPanel({
                     cursor: "pointer"
                 }}
             >
-                Reset Studio
+                إعادة ضبط المختبر
             </button>
         </div>
     );

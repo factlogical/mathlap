@@ -1,0 +1,1404 @@
+.reglab-shell {
+  --rg-bg-0: #070f1f;
+  --rg-bg-1: #0b1730;
+  --rg-panel: rgba(13, 26, 50, 0.82);
+  --rg-border: rgba(89, 119, 171, 0.44);
+  --rg-text: #d8e7ff;
+  --rg-muted: #98add4;
+  --rg-accent: #2dd4bf;
+  --rg-accent-2: #22d3ee;
+  --rg-warn: #f59e0b;
+  --rg-good: #34d399;
+  direction: rtl;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.82rem;
+  padding: 0.82rem;
+  overflow: hidden;
+  background:
+    radial-gradient(900px 500px at 5% 0%, rgba(45, 212, 191, 0.15), transparent 60%),
+    radial-gradient(920px 420px at 95% 5%, rgba(34, 211, 238, 0.13), transparent 58%),
+    linear-gradient(130deg, var(--rg-bg-0), var(--rg-bg-1) 52%, #071528);
+}
+
+html[data-theme="light"] .reglab-shell {
+  --rg-bg-0: #f3f8ff;
+  --rg-bg-1: #e9f1fc;
+  --rg-panel: rgba(255, 255, 255, 0.92);
+  --rg-border: rgba(117, 145, 188, 0.45);
+  --rg-text: #0f172a;
+  --rg-muted: #51627d;
+  --rg-accent: #0f766e;
+  --rg-accent-2: #0284c7;
+  --rg-warn: #b45309;
+  --rg-good: #047857;
+  background:
+    radial-gradient(900px 500px at 5% 0%, rgba(13, 148, 136, 0.12), transparent 60%),
+    radial-gradient(920px 420px at 95% 5%, rgba(2, 132, 199, 0.12), transparent 58%),
+    linear-gradient(130deg, var(--rg-bg-0), var(--rg-bg-1) 52%, #eef4ff);
+}
+
+.reglab-shell.is-fullscreen {
+  position: fixed;
+  inset: 8px;
+  z-index: 1100;
+  min-height: calc(100vh - 16px);
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 28px 90px rgba(2, 8, 23, 0.7);
+}
+
+.reglab-header {
+  border: 1px solid var(--rg-border);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  background: linear-gradient(145deg, rgba(14, 25, 47, 0.95), rgba(11, 21, 40, 0.85));
+  box-shadow: 0 10px 30px rgba(2, 8, 23, 0.45);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  text-align: right;
+}
+
+.reglab-header-actions {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.reglab-header-actions button {
+  border: 1px solid rgba(102, 125, 170, 0.7);
+  background: linear-gradient(150deg, rgba(12, 30, 59, 0.9), rgba(15, 36, 67, 0.72));
+  color: #d8e7ff;
+  padding: 0.38rem 0.58rem;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reglab-header-actions button:hover {
+  border-color: rgba(45, 212, 191, 0.95);
+  color: #effffc;
+}
+
+.reglab-header h3 {
+  margin: 0 0 0.2rem;
+  color: #ecf7ff;
+  letter-spacing: 0.2px;
+  font-size: 1.1rem;
+}
+
+.reglab-header p {
+  margin: 0;
+  color: var(--rg-muted);
+  font-size: 0.85rem;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-header {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.97), rgba(240, 247, 255, 0.94));
+}
+
+html[data-theme="light"] .reglab-shell .reglab-header h3 {
+  color: #0f172a;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-header-actions button {
+  background: linear-gradient(150deg, rgba(241, 245, 252, 0.95), rgba(227, 236, 248, 0.9));
+  color: #0f172a;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-panel {
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.reglab-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.reglab-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  background: rgba(13, 52, 83, 0.55);
+  color: #bff7ef;
+  font-size: 0.75rem;
+  padding: 0.32rem 0.52rem;
+  border-radius: 999px;
+  animation: reglabBadgeIn 280ms ease;
+}
+
+.reglab-badge.warn {
+  border-color: rgba(245, 158, 11, 0.65);
+  color: #fde68a;
+  background: rgba(120, 64, 12, 0.45);
+}
+
+@keyframes reglabBadgeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reglab-main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+.reglab-panel {
+  border: 1px solid var(--rg-border);
+  border-radius: 14px;
+  background: var(--rg-panel);
+  backdrop-filter: blur(7px);
+}
+
+.reglab-heavy-placeholder {
+  min-height: 180px;
+  display: grid;
+  place-content: center;
+  gap: 0.3rem;
+  text-align: center;
+  color: #b6c8e8;
+  background: linear-gradient(135deg, rgba(10, 24, 46, 0.78), rgba(8, 16, 32, 0.85));
+}
+
+.reglab-heavy-placeholder strong {
+  font-size: 0.92rem;
+  color: #cfe3ff;
+}
+
+.reglab-heavy-placeholder p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #90a8cd;
+}
+
+.reglab-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  overflow: hidden;
+}
+
+.reglab-canvas-wrap {
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px 14px 0 0;
+}
+
+.reglab-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.reglab-hint {
+  border-top: 1px solid rgba(98, 121, 161, 0.45);
+  padding: 0.62rem 0.8rem;
+  font-size: 0.83rem;
+  color: #b4c7e9;
+  background: rgba(8, 18, 35, 0.72);
+}
+
+.reglab-side {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(210px, 1fr);
+  gap: 0.68rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  direction: rtl;
+  padding-left: 0.1rem;
+}
+
+.reglab-side > * {
+  direction: ltr;
+}
+
+.reglab-side::-webkit-scrollbar {
+  width: 8px;
+}
+
+.reglab-side::-webkit-scrollbar-track {
+  background: rgba(8, 20, 39, 0.6);
+  border-radius: 999px;
+}
+
+.reglab-side::-webkit-scrollbar-thumb {
+  background: rgba(84, 112, 160, 0.8);
+  border-radius: 999px;
+}
+
+.reglab-side::-webkit-scrollbar-thumb:hover {
+  background: rgba(110, 145, 205, 0.95);
+}
+
+.reglab-right {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.68rem;
+  overflow: hidden;
+}
+
+.reglab-right.hide-stage {
+  grid-template-rows: auto;
+  align-content: start;
+}
+
+.reglab-right .reglab-controls {
+  max-height: 44vh;
+  overflow-y: auto;
+}
+
+.reglab-controls {
+  padding: 0.76rem;
+  display: grid;
+  gap: 0.62rem;
+}
+
+.reglab-controls-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  color: #def7ff;
+  font-size: 0.84rem;
+}
+
+.reglab-controls-grid {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.reglab-variant {
+  border: 1px solid rgba(94, 117, 153, 0.5);
+  border-radius: 10px;
+  background: rgba(8, 19, 39, 0.68);
+  padding: 0.5rem;
+}
+
+.reglab-variant > span {
+  display: block;
+  color: #cfe2ff;
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+}
+
+.reglab-variant > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+}
+
+.reglab-variant-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.reglab-variant button {
+  border: 1px solid rgba(102, 125, 170, 0.7);
+  border-radius: 8px;
+  background: rgba(10, 23, 45, 0.85);
+  color: #cfe0ff;
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+}
+
+.reglab-variant button.active {
+  border-color: rgba(45, 212, 191, 0.95);
+  color: #d9fffb;
+  background: rgba(12, 76, 70, 0.45);
+}
+
+.reglab-complexity {
+  height: 16px;
+  border: 1px solid rgba(94, 117, 153, 0.55);
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(7, 17, 35, 0.8);
+  position: relative;
+}
+
+.reglab-complexity-fill {
+  height: 100%;
+  transition: width 0.2s ease;
+}
+
+.reglab-complexity-fill.good {
+  background: linear-gradient(90deg, #22c55e, #34d399);
+}
+
+.reglab-complexity-fill.medium {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.reglab-complexity-fill.high {
+  background: linear-gradient(90deg, #ef4444, #fb7185);
+}
+
+.reglab-complexity span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  color: #f8fafc;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+.reglab-field {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.reglab-field span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--rg-text);
+  font-size: 0.8rem;
+}
+
+.reglab-controls-row {
+  display: grid;
+  gap: 0.33rem;
+}
+
+.reglab-controls-row label {
+  color: var(--rg-text);
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.reglab-controls select,
+.reglab-chat-input input {
+  width: 100%;
+  border: 1px solid rgba(96, 119, 161, 0.75);
+  border-radius: 9px;
+  padding: 0.48rem 0.56rem;
+  background: rgba(7, 17, 36, 0.96);
+  color: #dce7ff;
+}
+
+.reglab-chat-input input {
+  direction: rtl;
+}
+
+.reglab-controls select:focus,
+.reglab-chat-input input:focus {
+  outline: none;
+  border-color: rgba(45, 212, 191, 0.9);
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.22);
+}
+
+.reglab-controls input[type="range"] {
+  width: 100%;
+  accent-color: var(--rg-accent-2);
+}
+
+.reglab-presets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.reglab-presets button,
+.reglab-buttons button,
+.reglab-chat-quick button,
+.reglab-chat-input button,
+.reglab-chat-toggle {
+  border: 1px solid rgba(102, 125, 170, 0.7);
+  background: linear-gradient(150deg, rgba(12, 30, 59, 0.9), rgba(15, 36, 67, 0.72));
+  color: #cfe0ff;
+  padding: 0.45rem 0.54rem;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reglab-presets button:hover,
+.reglab-buttons button:hover,
+.reglab-chat-quick button:hover,
+.reglab-chat-input button:hover,
+.reglab-chat-toggle:hover {
+  border-color: rgba(45, 212, 191, 0.95);
+  color: #effffc;
+  transform: translateY(-1px);
+}
+
+.reglab-presets button:disabled,
+.reglab-buttons button:disabled,
+.reglab-chat-quick button:disabled,
+.reglab-chat-input button:disabled,
+.reglab-chat-toggle:disabled {
+  opacity: 0.44;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.reglab-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.reglab-buttons button,
+.reglab-chat-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.reglab-btn-primary {
+  border-color: rgba(45, 212, 191, 0.95) !important;
+  background: linear-gradient(145deg, rgba(10, 90, 82, 0.92), rgba(9, 122, 110, 0.82)) !important;
+  color: #e8fffd !important;
+  box-shadow: 0 8px 20px rgba(10, 140, 126, 0.2);
+}
+
+.reglab-class-picker {
+  border: 1px solid rgba(94, 114, 154, 0.55);
+  border-radius: 11px;
+  padding: 0.56rem;
+  background: rgba(8, 19, 39, 0.66);
+}
+
+.reglab-class-picker > span {
+  color: var(--rg-text);
+  font-size: 0.8rem;
+}
+
+.reglab-class-picker > div {
+  margin-top: 0.4rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+}
+
+.reglab-class-picker button.active {
+  border-color: rgba(34, 211, 238, 0.95);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.45) inset;
+}
+
+.reglab-class-picker button.class0 {
+  color: #fda4af;
+}
+
+.reglab-class-picker button.class1 {
+  color: #7dd3fc;
+}
+
+.reglab-class-picker small {
+  margin-top: 0.35rem;
+  display: block;
+  color: #8ea6d4;
+  font-size: 0.72rem;
+}
+
+.reglab-stats {
+  border-top: 1px solid rgba(100, 121, 161, 0.46);
+  padding-top: 0.45rem;
+}
+
+.reglab-stats p {
+  margin: 0.22rem 0;
+  color: #a9bfe7;
+  font-size: 0.8rem;
+}
+
+.reglab-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #f6fbff;
+}
+
+.reglab-micro-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #b8ecd8;
+  font-size: 0.75rem;
+  padding: 0.46rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(7, 52, 45, 0.45);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.reglab-visualizer {
+  padding: 0.72rem;
+  display: grid;
+  grid-template-rows: auto 170px auto auto;
+  gap: 0.54rem;
+}
+
+.reglab-visualizer h4 {
+  margin: 0;
+  color: #ebf5ff;
+  font-size: 0.92rem;
+}
+
+.reglab-loss-canvas {
+  width: 100%;
+  height: 170px;
+  border-radius: 10px;
+  border: 1px solid rgba(95, 117, 156, 0.52);
+  background: #0a1327;
+}
+
+.reglab-equation {
+  border: 1px solid rgba(94, 117, 153, 0.5);
+  border-radius: 9px;
+  padding: 0.52rem;
+  background: rgba(8, 19, 39, 0.72);
+}
+
+.reglab-equation strong {
+  display: block;
+  color: #e8f3ff;
+  font-size: 0.79rem;
+  margin-bottom: 0.25rem;
+}
+
+.reglab-equation code {
+  color: #9be8ff;
+  font-size: 0.79rem;
+  word-break: break-word;
+}
+
+.reglab-equation-meta {
+  margin-top: 0.38rem;
+  display: flex;
+  gap: 0.35rem;
+}
+
+.reglab-equation-meta span {
+  font-size: 0.71rem;
+  color: #bcf1ff;
+  border: 1px solid rgba(34, 211, 238, 0.42);
+  border-radius: 999px;
+  padding: 0.18rem 0.42rem;
+  background: rgba(12, 58, 83, 0.45);
+}
+
+.reglab-visualizer-stats p {
+  margin: 0.2rem 0;
+  font-size: 0.79rem;
+  color: #afc2e6;
+}
+
+.reglab-overfit-note {
+  color: #fbbf24 !important;
+  font-weight: 600;
+}
+
+.reglab-landscape {
+  padding: 0.66rem;
+  display: grid;
+  grid-template-rows: auto minmax(250px, 34vh);
+  gap: 0.48rem;
+}
+
+.reglab-landscape.disabled {
+  grid-template-rows: auto;
+}
+
+.reglab-landscape-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.reglab-landscape-head strong {
+  color: #eaf4ff;
+  font-size: 0.86rem;
+}
+
+.reglab-landscape-head span {
+  color: #a8d7ff;
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.reglab-landscape-plot {
+  border: 1px solid rgba(95, 117, 156, 0.52);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0a1327;
+  min-height: 250px;
+}
+
+.reglab-log-surface,
+.reglab-loss-fn {
+  padding: 0.66rem;
+  display: grid;
+  grid-template-rows: auto minmax(250px, 32vh);
+  gap: 0.48rem;
+}
+
+.reglab-log-surface.disabled,
+.reglab-loss-fn.disabled {
+  grid-template-rows: auto;
+}
+
+.reglab-surface-head,
+.reglab-loss-fn-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.reglab-surface-head strong,
+.reglab-loss-fn-head strong {
+  color: #eaf4ff;
+  font-size: 0.86rem;
+}
+
+.reglab-surface-head span,
+.reglab-loss-fn-head span {
+  color: #a8d7ff;
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.reglab-surface-plot,
+.reglab-loss-fn-plot {
+  border: 1px solid rgba(95, 117, 156, 0.52);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0a1327;
+  min-height: 250px;
+}
+
+.reglab-chat {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  overflow: hidden;
+}
+
+.reglab-chat-header {
+  border-bottom: 1px solid rgba(95, 116, 153, 0.46);
+  padding: 0.58rem 0.7rem;
+  display: flex;
+  justify-content: space-between;
+  color: #d8e9ff;
+  font-size: 0.79rem;
+  text-align: right;
+}
+
+.reglab-chat-log {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reglab-msg {
+  border: 1px solid rgba(87, 109, 149, 0.64);
+  border-radius: 9px;
+  padding: 0.48rem 0.56rem;
+  font-size: 0.78rem;
+  line-height: 1.46;
+  animation: reglabMsgIn 180ms ease;
+  text-align: right;
+}
+
+@keyframes reglabMsgIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reglab-msg.assistant {
+  background: rgba(14, 31, 58, 0.82);
+  color: #dcedff;
+}
+
+.reglab-msg.user {
+  background: rgba(15, 60, 94, 0.8);
+  color: #d7f8ff;
+}
+
+.reglab-chat-quick,
+.reglab-chat-input {
+  border-top: 1px solid rgba(95, 116, 152, 0.44);
+  padding: 0.52rem;
+  display: grid;
+  gap: 0.38rem;
+}
+
+.reglab-chat-quick {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.reglab-chat-input {
+  grid-template-columns: 1fr auto;
+  direction: rtl;
+}
+
+@media (max-width: 1320px) {
+  .reglab-main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+  }
+
+  .reglab-side {
+    grid-template-rows: auto auto minmax(250px, 1fr);
+  }
+
+  .reglab-right .reglab-controls {
+    max-height: none;
+  }
+}
+
+/* ===== Regression UI Interaction Polish ===== */
+.reglab-panel,
+.reglab-header,
+.reglab-badge,
+.reglab-stat-chip {
+  transition: box-shadow 0.24s ease, border-color 0.24s ease, transform 0.24s ease, background 0.24s ease;
+}
+
+.reglab-panel:hover {
+  border-color: rgba(45, 212, 191, 0.46);
+  box-shadow: 0 14px 28px rgba(2, 8, 23, 0.2);
+}
+
+.reglab-header-actions button,
+.reglab-variant button,
+.reglab-presets button,
+.reglab-buttons button,
+.reglab-chat-quick button,
+.reglab-chat-input button,
+.reglab-chat-toggle,
+.canvas-toolbar button,
+.reglab-class-picker button {
+  position: relative;
+  overflow: hidden;
+}
+
+.reglab-header-actions button::after,
+.reglab-variant button::after,
+.reglab-presets button::after,
+.reglab-buttons button::after,
+.reglab-chat-quick button::after,
+.reglab-chat-input button::after,
+.reglab-chat-toggle::after,
+.canvas-toolbar button::after,
+.reglab-class-picker button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  opacity: 0;
+  transform: translateX(-38%);
+  transition: opacity 0.24s ease, transform 0.28s ease;
+  pointer-events: none;
+}
+
+.reglab-header-actions button:hover::after,
+.reglab-variant button:hover::after,
+.reglab-presets button:hover::after,
+.reglab-buttons button:hover::after,
+.reglab-chat-quick button:hover::after,
+.reglab-chat-input button:hover::after,
+.reglab-chat-toggle:hover::after,
+.canvas-toolbar button:hover::after,
+.reglab-class-picker button:hover::after {
+  opacity: 1;
+  transform: translateX(22%);
+}
+
+.reglab-header-actions button:active,
+.reglab-variant button:active,
+.reglab-presets button:active,
+.reglab-buttons button:active,
+.reglab-chat-quick button:active,
+.reglab-chat-input button:active,
+.reglab-chat-toggle:active,
+.canvas-toolbar button:active,
+.reglab-class-picker button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.reglab-variant button.active,
+.canvas-toolbar button.active,
+.reglab-class-picker button.active,
+.reglab-btn-primary {
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.32) inset, 0 8px 18px rgba(10, 140, 126, 0.2);
+}
+
+.reglab-controls select,
+.reglab-chat-input input {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.reglab-controls select:hover,
+.reglab-chat-input input:hover {
+  border-color: rgba(45, 212, 191, 0.64);
+}
+
+.reglab-controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.22);
+}
+
+.reglab-controls input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.22);
+}
+
+.reglab-canvas-wrap.is-dragging::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(34, 211, 238, 0.7);
+  border-radius: 12px;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25) inset;
+  animation: reglabDragPulse 1s ease-in-out infinite;
+}
+
+.reglab-canvas-wrap.is-dragging .canvas-toolbar {
+  border-color: rgba(34, 211, 238, 0.95);
+  box-shadow: 0 10px 20px rgba(8, 47, 73, 0.35);
+}
+
+@keyframes reglabDragPulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ===== Regression Light Theme Refinement ===== */
+html[data-theme="light"] .reglab-shell .reglab-header-actions button,
+html[data-theme="light"] .reglab-shell .reglab-presets button,
+html[data-theme="light"] .reglab-shell .reglab-buttons button,
+html[data-theme="light"] .reglab-shell .reglab-chat-quick button,
+html[data-theme="light"] .reglab-shell .reglab-chat-input button,
+html[data-theme="light"] .reglab-shell .reglab-chat-toggle,
+html[data-theme="light"] .reglab-shell .canvas-toolbar button,
+html[data-theme="light"] .reglab-shell .reglab-class-picker button {
+  border-color: rgba(110, 141, 188, 0.58);
+  background: linear-gradient(150deg, rgba(250, 253, 255, 0.98), rgba(236, 244, 255, 0.94));
+  color: #1f3656;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-header-actions button:hover,
+html[data-theme="light"] .reglab-shell .reglab-presets button:hover,
+html[data-theme="light"] .reglab-shell .reglab-buttons button:hover,
+html[data-theme="light"] .reglab-shell .reglab-chat-quick button:hover,
+html[data-theme="light"] .reglab-shell .reglab-chat-input button:hover,
+html[data-theme="light"] .reglab-shell .reglab-chat-toggle:hover,
+html[data-theme="light"] .reglab-shell .canvas-toolbar button:hover,
+html[data-theme="light"] .reglab-shell .reglab-class-picker button:hover {
+  border-color: rgba(2, 132, 199, 0.75);
+  color: #0c4a6e;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-controls-title,
+html[data-theme="light"] .reglab-shell .reglab-field span,
+html[data-theme="light"] .reglab-shell .reglab-controls-row label,
+html[data-theme="light"] .reglab-shell .reglab-variant > span,
+html[data-theme="light"] .reglab-shell .reglab-class-picker > span {
+  color: #1f3656;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-mono {
+  color: #0f172a;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-variant,
+html[data-theme="light"] .reglab-shell .reglab-class-picker,
+html[data-theme="light"] .reglab-shell .reglab-equation,
+html[data-theme="light"] .reglab-shell .reglab-hint,
+html[data-theme="light"] .reglab-shell .reglab-micro-tip,
+html[data-theme="light"] .reglab-shell .reglab-chat-header,
+html[data-theme="light"] .reglab-shell .reglab-chat-quick,
+html[data-theme="light"] .reglab-shell .reglab-chat-input {
+  border-color: rgba(117, 145, 188, 0.42);
+  background: rgba(247, 251, 255, 0.92);
+}
+
+html[data-theme="light"] .reglab-shell .reglab-hint,
+html[data-theme="light"] .reglab-shell .reglab-stats p,
+html[data-theme="light"] .reglab-shell .reglab-micro-tip span,
+html[data-theme="light"] .reglab-shell .reglab-chat-header {
+  color: #4b5f7b;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-msg.assistant {
+  background: rgba(241, 247, 255, 0.94);
+  border-color: rgba(117, 145, 188, 0.38);
+  color: #273d5d;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-msg.user {
+  background: rgba(224, 242, 254, 0.92);
+  border-color: rgba(2, 132, 199, 0.38);
+  color: #0c4a6e;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-badge,
+html[data-theme="light"] .reglab-shell .reglab-stat-chip {
+  border-color: rgba(2, 132, 199, 0.42);
+  background: linear-gradient(135deg, rgba(224, 242, 254, 0.96), rgba(207, 250, 254, 0.9));
+  color: #0c4a6e;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-badge.warn {
+  border-color: rgba(217, 119, 6, 0.55);
+  background: linear-gradient(135deg, rgba(255, 247, 237, 0.96), rgba(255, 237, 213, 0.92));
+  color: #9a3412;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-stat-label {
+  color: #526278;
+}
+
+html[data-theme="light"] .reglab-shell .canvas-toolbar {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(117, 145, 188, 0.52);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="light"] .reglab-shell .reglab-btn-primary {
+  border-color: rgba(13, 148, 136, 0.84) !important;
+  background: linear-gradient(145deg, rgba(13, 148, 136, 0.18), rgba(5, 150, 105, 0.2)) !important;
+  color: #0f766e !important;
+}
+
+@media (max-width: 820px) {
+  .reglab-presets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reglab-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .reglab-chat-quick {
+    grid-template-columns: 1fr;
+  }
+}
+/* ===== Regression Lab 3-Column Upgrade ===== */
+.reglab-main {
+  grid-template-columns: 300px minmax(0, 1fr) 300px;
+}
+
+.reglab-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  background: rgba(13, 52, 83, 0.55);
+  color: #bff7ef;
+  font-size: 0.74rem;
+  padding: 0.28rem 0.56rem;
+  border-radius: 999px;
+  animation: reglabBadgeIn 280ms ease;
+}
+
+.reglab-stat-chip.warn {
+  background: rgba(120, 64, 12, 0.45);
+}
+
+.reglab-stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reglab-stat-label {
+  color: #9bb0d8;
+}
+
+.reglab-stat-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  direction: ltr;
+}
+
+.reglab-left {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(210px, 1fr);
+  gap: 0.68rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  direction: rtl;
+  padding-left: 0.1rem;
+}
+
+.reglab-left > * {
+  direction: rtl;
+}
+
+.reglab-left::-webkit-scrollbar {
+  width: 8px;
+}
+
+.reglab-left::-webkit-scrollbar-track {
+  background: rgba(8, 20, 39, 0.6);
+  border-radius: 999px;
+}
+
+.reglab-left::-webkit-scrollbar-thumb {
+  background: rgba(84, 112, 160, 0.8);
+  border-radius: 999px;
+}
+
+.reglab-left::-webkit-scrollbar-thumb:hover {
+  background: rgba(110, 145, 205, 0.95);
+}
+
+.reglab-center {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.reglab-center.hide-stage {
+  display: grid;
+  place-items: center;
+}
+
+.reglab-stage-hidden-note {
+  color: #bcd0f3;
+  border: 1px dashed rgba(119, 147, 201, 0.55);
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+  background: rgba(10, 23, 44, 0.55);
+  font-size: 0.9rem;
+}
+
+.reglab-right {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 1fr;
+  gap: 0.68rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.reglab-right .reglab-controls {
+  height: 100%;
+  max-height: none;
+}
+
+.canvas-toolbar {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  background: rgba(8, 20, 39, 0.85);
+  border: 1px solid rgba(105, 130, 178, 0.55);
+  border-radius: 10px;
+  padding: 0.36rem 0.45rem;
+  backdrop-filter: blur(8px);
+  direction: rtl;
+}
+
+.canvas-toolbar .tool-group {
+  display: flex;
+  gap: 0.32rem;
+}
+
+.canvas-toolbar button {
+  border: 1px solid rgba(102, 125, 170, 0.7);
+  background: rgba(12, 30, 59, 0.9);
+  color: #d9e6ff;
+  border-radius: 8px;
+  padding: 0.28rem 0.5rem;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.canvas-toolbar button.active {
+  border-color: rgba(45, 212, 191, 0.95);
+  color: #e7fffb;
+  background: rgba(11, 73, 66, 0.65);
+}
+
+.reglab-loss-wrap {
+  position: relative;
+}
+
+.reglab-loss-tooltip {
+  position: absolute;
+  pointer-events: none;
+  min-width: 130px;
+  background: rgba(5, 12, 24, 0.95);
+  border: 1px solid rgba(94, 126, 186, 0.6);
+  border-radius: 8px;
+  padding: 0.42rem 0.5rem;
+  color: #d8e7ff;
+  font-size: 0.72rem;
+  z-index: 3;
+}
+
+.reglab-loss-tooltip p {
+  margin: 0.1rem 0;
+}
+
+.reglab-equation-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.34rem;
+  margin-bottom: 0.52rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.reglab-equation-display .eq-label {
+  color: #b7caee;
+  font-size: 0.84rem;
+}
+
+.reglab-equation-display .eq-value.w {
+  color: #3b82f6;
+  font-weight: 700;
+}
+
+.reglab-equation-display .eq-value.b {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.reglab-manual-control {
+  display: grid;
+  gap: 0.22rem;
+  margin-bottom: 0.42rem;
+}
+
+.reglab-manual-control label {
+  display: flex;
+  justify-content: space-between;
+  color: #c4d5f5;
+  font-size: 0.75rem;
+}
+
+.reglab-manual-control input[type="range"] {
+  width: 100%;
+  accent-color: #60a5fa;
+}
+
+.reglab-shell.is-fullscreen .reglab-landscape {
+  grid-template-rows: auto minmax(320px, 42vh);
+}
+
+.reglab-shell.is-fullscreen .reglab-landscape-plot {
+  min-height: 320px;
+}
+
+.reglab-shell.is-fullscreen .reglab-log-surface,
+.reglab-shell.is-fullscreen .reglab-loss-fn {
+  grid-template-rows: auto minmax(320px, 40vh);
+}
+
+.reglab-shell.is-fullscreen .reglab-surface-plot,
+.reglab-shell.is-fullscreen .reglab-loss-fn-plot {
+  min-height: 320px;
+}
+
+@media (max-width: 1320px) {
+  .reglab-main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(320px, 1fr) auto;
+  }
+
+  .reglab-left {
+    grid-template-rows: auto auto minmax(250px, 1fr);
+  }
+
+  .reglab-right {
+    overflow: visible;
+  }
+
+  .reglab-right .reglab-controls {
+    height: auto;
+  }
+}
+
+/* ===== Regression Interaction + Light Theme Final Polish ===== */
+.reglab-canvas-wrap {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+}
+
+.reglab-canvas-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+  background: radial-gradient(180px 180px at var(--pointer-x) var(--pointer-y), rgba(34, 211, 238, 0.2), transparent 72%);
+  transition: opacity 0.2s ease;
+}
+
+.reglab-canvas-wrap.is-hovering::before {
+  opacity: 1;
+}
+
+.reglab-canvas-wrap.is-dragging::before {
+  opacity: 1;
+  background: radial-gradient(210px 210px at var(--pointer-x) var(--pointer-y), rgba(34, 211, 238, 0.26), transparent 74%);
+}
+
+.reglab-canvas-wrap.is-dragging::after {
+  z-index: 3;
+}
+
+.reglab-canvas {
+  position: relative;
+  z-index: 2;
+}
+
+.reglab-controls select {
+  cursor: pointer;
+}
+
+.reglab-controls select:focus {
+  transform: translateY(-1px);
+}
+
+.canvas-toolbar button.active {
+  transform: translateY(-1px);
+}
+
+html[data-theme="light"] .reglab-shell .reglab-panel {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.96), rgba(241, 247, 255, 0.92));
+  border-color: rgba(117, 145, 188, 0.42);
+}
+
+html[data-theme="light"] .reglab-shell .reglab-controls select,
+html[data-theme="light"] .reglab-shell .reglab-chat-input input {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.98), rgba(243, 249, 255, 0.96));
+  color: #12304f;
+  border-color: rgba(117, 145, 188, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+html[data-theme="light"] .reglab-shell .reglab-controls select:focus,
+html[data-theme="light"] .reglab-shell .reglab-chat-input input:focus {
+  border-color: rgba(2, 132, 199, 0.74);
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.16);
+}
+
+html[data-theme="light"] .reglab-shell .reglab-controls select option {
+  color: #0f172a;
+  background: #ffffff;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-controls input[type="range"] {
+  accent-color: #0284c7;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-controls input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(2, 132, 199, 0.25), rgba(14, 165, 233, 0.35));
+}
+
+html[data-theme="light"] .reglab-shell .reglab-controls input[type="range"]::-webkit-slider-thumb {
+  background: #0284c7;
+  box-shadow: 0 0 0 5px rgba(2, 132, 199, 0.16);
+}
+
+html[data-theme="light"] .reglab-shell .reglab-controls input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(2, 132, 199, 0.25), rgba(14, 165, 233, 0.35));
+}
+
+html[data-theme="light"] .reglab-shell .reglab-controls input[type="range"]::-moz-range-thumb {
+  background: #0284c7;
+  box-shadow: 0 0 0 5px rgba(2, 132, 199, 0.16);
+}
+
+html[data-theme="light"] .reglab-shell .reglab-hint {
+  background: rgba(240, 247, 255, 0.94);
+  border-top-color: rgba(117, 145, 188, 0.4);
+  color: #425673;
+}
+
+html[data-theme="light"] .reglab-shell .reglab-canvas-wrap::before {
+  background: radial-gradient(190px 190px at var(--pointer-x) var(--pointer-y), rgba(2, 132, 199, 0.14), transparent 72%);
+}
+
+/* ===== Regression Interaction Alignment (Dark + Light) ===== */
+.reglab-shell .reglab-controls,
+.reglab-shell .reglab-visualizer,
+.reglab-shell .reglab-landscape,
+.reglab-shell .reglab-log-surface,
+.reglab-shell .reglab-loss-fn,
+.reglab-shell .reglab-chat {
+  transition: border-color 0.24s ease, box-shadow 0.24s ease, transform 0.24s ease, background 0.24s ease;
+}
+
+.reglab-shell .reglab-controls:hover,
+.reglab-shell .reglab-visualizer:hover,
+.reglab-shell .reglab-landscape:hover,
+.reglab-shell .reglab-log-surface:hover,
+.reglab-shell .reglab-loss-fn:hover,
+.reglab-shell .reglab-chat:hover {
+  border-color: rgba(34, 211, 238, 0.42);
+  box-shadow: 0 16px 28px rgba(2, 8, 23, 0.24);
+}
+
+.reglab-shell .reglab-header-actions button.active,
+.reglab-shell .reglab-buttons button.active,
+.reglab-shell .reglab-chat-quick button.active {
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.3) inset, 0 10px 18px rgba(8, 47, 73, 0.28);
+}
+
+html[data-theme="light"] .reglab-shell .reglab-controls:hover,
+html[data-theme="light"] .reglab-shell .reglab-visualizer:hover,
+html[data-theme="light"] .reglab-shell .reglab-landscape:hover,
+html[data-theme="light"] .reglab-shell .reglab-log-surface:hover,
+html[data-theme="light"] .reglab-shell .reglab-loss-fn:hover,
+html[data-theme="light"] .reglab-shell .reglab-chat:hover {
+  border-color: rgba(2, 132, 199, 0.42);
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.14);
+}

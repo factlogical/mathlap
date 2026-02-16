@@ -1,0 +1,984 @@
+.fourier-lab {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.72rem;
+  padding: 0.75rem;
+  background:
+    radial-gradient(760px 360px at 15% 15%, rgba(56, 189, 248, 0.11), transparent 65%),
+    radial-gradient(680px 340px at 85% 10%, rgba(34, 197, 94, 0.09), transparent 62%),
+    linear-gradient(135deg, rgba(7, 12, 24, 0.96), rgba(6, 10, 19, 0.98));
+  border: 1px solid rgba(71, 85, 105, 0.65);
+  border-radius: 12px;
+  overflow: hidden;
+  animation: fourierFadeIn 0.28s ease-out;
+}
+
+.fourier-lab--embedded {
+  border: none;
+  border-radius: 0;
+  padding: 0.62rem;
+}
+
+.fourier-lab--fullscreen {
+  position: fixed;
+  inset: 10px;
+  z-index: 1200;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(2, 8, 23, 0.65);
+}
+
+.fourier-top-restore {
+  align-self: flex-start;
+  border: 1px solid rgba(56, 189, 248, 0.7);
+  background: rgba(14, 116, 144, 0.24);
+  color: #d9f3ff;
+  border-radius: 8px;
+  padding: 0.36rem 0.62rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fourier-top-restore:hover {
+  background: rgba(14, 116, 144, 0.36);
+  border-color: rgba(34, 211, 238, 0.92);
+}
+
+.fourier-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.72rem 0.9rem;
+  border: 1px solid rgba(71, 85, 105, 0.55);
+  border-radius: 11px;
+  background: rgba(15, 23, 42, 0.82);
+}
+
+.fourier-header--compact {
+  justify-content: flex-end;
+}
+
+.fourier-header-title h2 {
+  margin: 0 0 0.22rem;
+  color: #e2e8f0;
+  font-size: 1.08rem;
+}
+
+.fourier-header-title p {
+  margin: 0;
+  color: #9aa7bb;
+  font-size: 0.84rem;
+}
+
+.fourier-header-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.46rem;
+  width: 100%;
+}
+
+.fourier-top-tabs-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.fourier-top-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.fourier-quality-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.fourier-quality-label {
+  color: #9fb2c9;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.fourier-view-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.fourier-icon-action {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(71, 85, 105, 0.8);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.64);
+  color: #d8e7f9;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.fourier-icon-action:hover {
+  border-color: rgba(56, 189, 248, 0.86);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 14px rgba(2, 132, 199, 0.24);
+}
+
+.fourier-icon-action.active {
+  border-color: rgba(34, 211, 238, 0.92);
+  background: linear-gradient(145deg, rgba(8, 47, 73, 0.9), rgba(14, 116, 144, 0.4));
+}
+
+.fourier-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  border: 1px solid rgba(71, 85, 105, 0.8);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.6);
+  color: #cbd5e1;
+  padding: 0.5rem 0.78rem;
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 0 0 0 rgba(56, 189, 248, 0);
+}
+
+.fourier-tab--main {
+  min-height: 40px;
+  font-size: 0.88rem;
+  padding: 0.58rem 0.86rem;
+  font-weight: 600;
+}
+
+.fourier-tab:hover {
+  transform: translateY(-1px);
+  border-color: rgba(56, 189, 248, 0.8);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.24);
+}
+
+.fourier-tab.active {
+  border-color: rgba(34, 211, 238, 0.95);
+  background: linear-gradient(140deg, rgba(8, 47, 73, 0.88), rgba(14, 116, 144, 0.38));
+  color: #cffafe;
+  box-shadow: 0 8px 18px rgba(34, 211, 238, 0.2);
+}
+
+.fourier-body {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 0.75rem;
+}
+
+.fourier-lab--fullscreen .fourier-body {
+  grid-template-columns: minmax(0, 1fr) 360px;
+}
+
+.fourier-lab--side-left .fourier-content {
+  order: 2;
+}
+
+.fourier-lab--side-left .fourier-side {
+  order: 1;
+}
+
+.fourier-content {
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid rgba(71, 85, 105, 0.55);
+  border-radius: 11px;
+  background: rgba(7, 16, 34, 0.72);
+  padding: 0.75rem;
+}
+
+.fourier-side {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: auto;
+}
+
+.fourier-panel {
+  border: 1px solid rgba(71, 85, 105, 0.65);
+  border-radius: 11px;
+  background: rgba(9, 20, 40, 0.85);
+  padding: 0.7rem;
+}
+
+.fourier-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.fourier-panel-head h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #e2e8f0;
+}
+
+.fourier-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  color: #7dd3fc;
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.74rem;
+}
+
+.fourier-btn-row {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.fourier-btn {
+  border: 1px solid rgba(56, 189, 248, 0.6);
+  background: rgba(14, 116, 144, 0.24);
+  color: #dbeafe;
+  border-radius: 8px;
+  padding: 0.36rem 0.58rem;
+  font-size: 0.8rem;
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.fourier-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(34, 211, 238, 0.9);
+  background: rgba(14, 116, 144, 0.38);
+  box-shadow: 0 8px 16px rgba(14, 116, 144, 0.25);
+}
+
+.fourier-btn.danger {
+  border-color: rgba(239, 68, 68, 0.75);
+  background: rgba(127, 29, 29, 0.32);
+}
+
+.fourier-chip-btn {
+  border: 1px solid rgba(71, 85, 105, 0.7);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  color: #d1dae8;
+  font-size: 0.77rem;
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.fourier-chip-btn:hover {
+  border-color: rgba(56, 189, 248, 0.72);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(56, 189, 248, 0.15);
+}
+
+.fourier-chip-btn.active {
+  border-color: rgba(34, 211, 238, 0.92);
+  background: rgba(14, 116, 144, 0.34);
+  color: #d8f5ff;
+}
+
+.fourier-chip-btn--accent {
+  border-color: rgba(74, 222, 128, 0.85);
+  background: rgba(21, 128, 61, 0.25);
+  color: #bbf7d0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+}
+
+.fourier-guide-card {
+  border: 1px solid rgba(34, 211, 238, 0.45);
+  border-radius: 11px;
+  background: linear-gradient(130deg, rgba(7, 39, 58, 0.9), rgba(9, 48, 40, 0.7));
+  padding: 0.58rem 0.72rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.fourier-guide-card-content {
+  min-width: 0;
+}
+
+.fourier-guide-card-content strong {
+  display: block;
+  color: #d5f5ff;
+  font-size: 0.88rem;
+  margin-bottom: 0.2rem;
+}
+
+.fourier-guide-card-content p {
+  margin: 0;
+  color: #c5deeb;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.fourier-guide-card-actions {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.fourier-guide-card-close {
+  border: 1px solid rgba(56, 189, 248, 0.76);
+  border-radius: 8px;
+  background: rgba(14, 116, 144, 0.25);
+  color: #e0f2fe;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.58rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.fourier-guide-card-close:hover {
+  background: rgba(14, 116, 144, 0.35);
+  border-color: rgba(34, 211, 238, 0.95);
+}
+
+.fourier-draw-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.72rem;
+}
+
+.fourier-canvas {
+  width: 100%;
+  height: 352px;
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  border-radius: 10px;
+  touch-action: none;
+  background: linear-gradient(180deg, rgba(2, 8, 23, 0.5), rgba(2, 8, 23, 0.2));
+}
+
+.fourier-epicycle {
+  height: 400px;
+}
+
+.fourier-lab--fullscreen .fourier-canvas {
+  height: 420px;
+}
+
+.fourier-lab--fullscreen .fourier-epicycle {
+  height: 470px;
+}
+
+.fourier-drawing-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #a6b5ca;
+  font-size: 0.78rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.fourier-status {
+  min-height: 1rem;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  margin-top: 0.45rem;
+}
+
+.fourier-epicycle-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.fourier-epicycle-toolbar label {
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fourier-epicycle-toolbar input {
+  width: 180px;
+}
+
+.fourier-meta {
+  color: #9fb0c7;
+  font-size: 0.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.fourier-slider {
+  width: 100%;
+  margin-bottom: 0.6rem;
+}
+
+.fourier-spectrum-bars {
+  height: 138px;
+  border: 1px solid rgba(71, 85, 105, 0.55);
+  border-radius: 9px;
+  background: rgba(2, 8, 23, 0.52);
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 0.35rem;
+}
+
+.fourier-spectrum-bar {
+  flex: 1;
+  border: none;
+  border-radius: 3px 3px 2px 2px;
+  background: rgba(71, 85, 105, 0.55);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.fourier-spectrum-bar.active {
+  background: linear-gradient(180deg, #22d3ee, #2563eb);
+}
+
+.fourier-spectrum-bar.disabled {
+  background: linear-gradient(180deg, #64748b, #334155);
+}
+
+.fourier-spectrum-bar:hover {
+  transform: translateY(-1px);
+}
+
+.fourier-help-text {
+  margin: 0;
+  color: #d1dae7;
+  line-height: 1.65;
+  font-size: 0.86rem;
+}
+
+.fourier-empty {
+  color: #90a2bc;
+  font-size: 0.84rem;
+  padding: 0.4rem 0.2rem;
+}
+
+.fourier-chat {
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+}
+
+.fourier-chat-messages {
+  flex: 1;
+  min-height: 120px;
+  max-height: 260px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+
+.fourier-msg {
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.fourier-msg.user {
+  flex-direction: row-reverse;
+}
+
+.fourier-msg-bubble {
+  border: 1px solid rgba(71, 85, 105, 0.65);
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 9px;
+  padding: 0.46rem 0.58rem;
+  color: #dce5f4;
+  font-size: 0.81rem;
+  line-height: 1.55;
+}
+
+.fourier-msg.user .fourier-msg-bubble {
+  border-color: rgba(56, 189, 248, 0.7);
+  background: rgba(14, 116, 144, 0.34);
+}
+
+.fourier-msg-icon {
+  color: #60a5fa;
+  margin-top: 2px;
+}
+
+.fourier-quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.fourier-chat-input {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.fourier-chat-input input {
+  flex: 1;
+  min-width: 0;
+}
+
+.fourier-builder {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.fourier-builder-top {
+  border: 1px solid rgba(71, 85, 105, 0.58);
+  border-radius: 10px;
+  background: rgba(10, 19, 37, 0.78);
+  padding: 0.65rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.fourier-builder-top h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #e2e8f0;
+}
+
+.fourier-preset-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.fourier-builder-canvas {
+  width: 100%;
+  height: 320px;
+  border-radius: 10px;
+  border: 1px solid rgba(71, 85, 105, 0.6);
+}
+
+.fourier-components {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.6rem;
+}
+
+.fourier-component-card {
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  border-radius: 10px;
+  background: rgba(9, 18, 35, 0.8);
+  padding: 0.58rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.fourier-component-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.15rem;
+}
+
+.fourier-component-card label {
+  color: #bfcbdd;
+  font-size: 0.75rem;
+}
+
+.fourier-component-card input {
+  width: 100%;
+}
+
+.fourier-icon-btn {
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(100, 116, 139, 0.7);
+  border-radius: 7px;
+  background: rgba(15, 23, 42, 0.7);
+  color: #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.fourier-apps {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.fourier-tab-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.fourier-tab-btn {
+  border: 1px solid rgba(71, 85, 105, 0.72);
+  border-radius: 9px;
+  background: rgba(10, 18, 34, 0.82);
+  color: #d1d9e6;
+  padding: 0.4rem 0.58rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.fourier-tab-btn.active {
+  border-color: rgba(34, 211, 238, 0.85);
+  background: rgba(14, 116, 144, 0.32);
+}
+
+.fourier-tab-btn:hover {
+  border-color: rgba(56, 189, 248, 0.76);
+}
+
+.fourier-app-card {
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  border-radius: 10px;
+  background: rgba(8, 16, 31, 0.78);
+  padding: 0.65rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.fourier-app-card label {
+  color: #c7d1e0;
+  font-size: 0.8rem;
+}
+
+.fourier-mini-canvas {
+  width: 100%;
+  height: 200px;
+  border: 1px solid rgba(71, 85, 105, 0.62);
+  border-radius: 9px;
+}
+
+.fourier-note-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 0.45rem;
+}
+
+.fourier-note-btn {
+  border: 1px solid rgba(71, 85, 105, 0.7);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.74);
+  color: #dbe4f2;
+  padding: 0.45rem 0.3rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.fourier-note-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(56, 189, 248, 0.82);
+}
+
+.fourier-note-btn small {
+  color: #98a9bf;
+  font-size: 0.7rem;
+}
+
+.fourier-note-status {
+  border: 1px dashed rgba(56, 189, 248, 0.5);
+  border-radius: 8px;
+  padding: 0.5rem;
+  color: #cfe4ff;
+  font-size: 0.82rem;
+}
+
+.fourier-math-panel {
+  position: relative;
+}
+
+.fourier-math-summary {
+  display: inline-flex;
+  gap: 0.42rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.55rem;
+}
+
+.fourier-equation-katex {
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  border-radius: 9px;
+  background: rgba(8, 17, 34, 0.68);
+  margin-bottom: 0.55rem;
+  padding: 0.45rem 0.62rem;
+  overflow-x: auto;
+}
+
+.fourier-equation-katex .katex-display {
+  margin: 0.35rem 0;
+}
+
+.fourier-equation-katex .katex {
+  color: #dbeafe;
+  font-size: 1.04em;
+}
+
+.fourier-equation-box {
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  border-radius: 9px;
+  background: rgba(2, 8, 23, 0.55);
+  padding: 0.55rem 0.62rem;
+  margin-bottom: 0.6rem;
+  overflow-x: auto;
+}
+
+.fourier-equation-box code {
+  color: #dbeafe;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.fourier-equation-rich {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.08rem;
+  white-space: normal;
+  line-height: 1.65;
+}
+
+.fourier-equation-prefix {
+  color: #dbeafe;
+  font-weight: 700;
+}
+
+.fourier-equation-term {
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(2, 132, 199, 0.12);
+}
+
+.fourier-equation-rest {
+  color: #9fb2c9;
+}
+
+.fourier-math-terms {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.fourier-math-term {
+  border: 1px solid rgba(71, 85, 105, 0.55);
+  border-radius: 8px;
+  background: rgba(9, 18, 35, 0.74);
+  padding: 0.45rem 0.5rem;
+}
+
+.fourier-math-term-meta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.2rem 0.5rem;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.fourier-math-term-meta strong {
+  color: #cde9ff;
+  font-size: 0.8rem;
+}
+
+.fourier-math-term-meta span {
+  color: #9eb2cb;
+  font-size: 0.74rem;
+}
+
+.fourier-math-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(51, 65, 85, 0.8);
+  overflow: hidden;
+}
+
+.fourier-math-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22d3ee, #2563eb);
+}
+
+.fourier-math-actions {
+  margin-top: 0.62rem;
+  display: inline-flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.fourier-math-modal {
+  position: absolute;
+  inset: 0;
+  border-radius: 11px;
+  background: rgba(2, 8, 23, 0.72);
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(4px);
+  z-index: 3;
+}
+
+.fourier-math-modal-card {
+  width: min(92%, 420px);
+  border: 1px solid rgba(71, 85, 105, 0.72);
+  border-radius: 11px;
+  background: rgba(9, 20, 40, 0.94);
+  padding: 0.85rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.fourier-math-modal-card h4 {
+  margin: 0;
+  color: #e2e8f0;
+  font-size: 0.92rem;
+}
+
+.fourier-math-modal-card p {
+  margin: 0;
+  color: #cdd9eb;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.fourier-math-inline-eq {
+  margin: 0;
+  color: #dbeafe;
+}
+
+.fourier-math-inline-eq .katex {
+  color: #dbeafe;
+}
+
+html[data-theme="light"] .fourier-lab {
+  background:
+    radial-gradient(760px 360px at 15% 15%, rgba(2, 132, 199, 0.14), transparent 65%),
+    radial-gradient(680px 340px at 85% 10%, rgba(16, 185, 129, 0.11), transparent 62%),
+    linear-gradient(135deg, #f4f9ff, #e9f1fb);
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+html[data-theme="light"] .fourier-header,
+html[data-theme="light"] .fourier-content,
+html[data-theme="light"] .fourier-panel,
+html[data-theme="light"] .fourier-builder-top,
+html[data-theme="light"] .fourier-app-card,
+html[data-theme="light"] .fourier-guide-card,
+html[data-theme="light"] .fourier-math-modal-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(148, 163, 184, 0.55);
+}
+
+html[data-theme="light"] .fourier-header-title h2,
+html[data-theme="light"] .fourier-panel-head h3,
+html[data-theme="light"] .fourier-builder-top h3,
+html[data-theme="light"] .fourier-guide-card-content strong,
+html[data-theme="light"] .fourier-equation-box code,
+html[data-theme="light"] .fourier-math-term-meta strong,
+html[data-theme="light"] .fourier-math-modal-card h4 {
+  color: #0f172a;
+}
+
+html[data-theme="light"] .fourier-header-title p,
+html[data-theme="light"] .fourier-help-text,
+html[data-theme="light"] .fourier-status,
+html[data-theme="light"] .fourier-component-card label,
+html[data-theme="light"] .fourier-app-card label,
+html[data-theme="light"] .fourier-guide-card-content p,
+html[data-theme="light"] .fourier-math-term-meta span,
+html[data-theme="light"] .fourier-math-modal-card p,
+html[data-theme="light"] .fourier-empty {
+  color: #3f536d;
+}
+
+html[data-theme="light"] .fourier-tab,
+html[data-theme="light"] .fourier-chip-btn,
+html[data-theme="light"] .fourier-tab-btn,
+html[data-theme="light"] .fourier-btn,
+html[data-theme="light"] .fourier-note-btn,
+html[data-theme="light"] .fourier-msg-bubble,
+html[data-theme="light"] .fourier-icon-btn,
+html[data-theme="light"] .fourier-icon-action {
+  background: rgba(248, 251, 255, 0.95);
+  color: #0f172a;
+  border-color: rgba(148, 163, 184, 0.8);
+}
+
+html[data-theme="light"] .fourier-guide-card-close,
+html[data-theme="light"] .fourier-top-restore {
+  background: rgba(255, 255, 255, 0.94);
+  color: #0f172a;
+  border-color: rgba(14, 165, 233, 0.56);
+}
+
+html[data-theme="light"] .fourier-equation-box,
+html[data-theme="light"] .fourier-math-term {
+  background: rgba(248, 251, 255, 0.95);
+  border-color: rgba(148, 163, 184, 0.55);
+}
+
+@media (max-width: 1280px) {
+  .fourier-body {
+    grid-template-columns: 1fr;
+  }
+
+  .fourier-side {
+    max-height: 55vh;
+  }
+
+  .fourier-lab--fullscreen .fourier-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .fourier-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fourier-top-tabs-row,
+  .fourier-top-controls-row,
+  .fourier-quality-toggle {
+    justify-content: flex-start;
+  }
+
+  .fourier-view-actions {
+    margin-inline-start: auto;
+  }
+
+  .fourier-guide-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@keyframes fourierFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

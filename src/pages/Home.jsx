@@ -8,8 +8,7 @@ import {
   FlaskConical,
   ArrowLeft,
   Cpu,
-  Atom,
-  Lock
+  Atom
 } from 'lucide-react';
 
 const Home = ({ onNavigate }) => {
@@ -335,24 +334,28 @@ const Home = ({ onNavigate }) => {
             </div>
           </button>
 
-          <div className="landing-card landing-card--physics landing-card--locked" aria-disabled="true">
+          <button
+            type="button"
+            onClick={() => onNavigate?.('physics')}
+            className="landing-card landing-card--physics"
+          >
             <div className="landing-card-inner">
               <div className="landing-card-content">
-                <div className="landing-card-badge landing-card-badge--locked">Locked</div>
-                <h3 className="landing-card-title">Physics Labs</h3>
+                <div className="landing-card-badge">Available</div>
+                <h3 className="landing-card-title">Physics Lab</h3>
                 <p className="landing-card-desc">
-                  Motion, fields, waves, and relativity labs are coming later.
+                  Explore Fourier analysis, waves, and real-world signal applications interactively.
                 </p>
                 <span className="landing-card-action landing-card-action--physics">
-                  Locked
-                  <Lock className="h-4 w-4" />
+                  Open Physics Lab
+                  <ArrowLeft className="h-4 w-4" />
                 </span>
               </div>
               <div className="landing-card-icon landing-card-icon--physics">
                 <Atom className="h-7 w-7" />
               </div>
             </div>
-          </div>
+          </button>
 
         </section>
       </div>

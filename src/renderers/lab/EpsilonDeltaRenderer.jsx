@@ -20,6 +20,9 @@ import {
 import * as math from "mathjs";
 import { interpretPromptToJson } from "../../agent/interpret";
 import ChatInterface from "../../components/chat/ChatInterface";
+import { useUISettings } from "../../context/UISettingsContext.jsx";
+import LabIntroModal from "../../components/shared/LabIntroModal";
+import { LIMITS_INTRO_SLIDES } from "../../components/shared/introSlides";
 
 const SPEED_PRESETS = {
     slow: { interval: 420, step: 0.03 },
@@ -30,10 +33,13 @@ const SPEED_PRESETS = {
 const EPS_MIN = 0.001;
 const EPS_MAX = 2;
 const DEFAULT_DOMAIN = { x: [-1, 5], y: [-1, 7] };
+const INTRO_LAB_ID = "limits";
+const INTRO_SEEN_KEY = `${INTRO_LAB_ID}_intro_seen`;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 const EpsilonDeltaRenderer = ({ spec }) => {
+    const { isArabic, t } = useUISettings();
     const canvasRef = useRef(null);
     const graphWrapRef = useRef(null);
     const scaleRef = useRef(null);
@@ -78,6 +84,10 @@ const EpsilonDeltaRenderer = ({ spec }) => {
     const [graphFullscreen, setGraphFullscreen] = useState(false);
     const [isPinned, setIsPinned] = useState(false);
     const [pinnedPos, setPinnedPos] = useState({ x: 0, y: 0 });
+    const [showIntro, setShowIntro] = useState(() => {
+        if (typeof window === "undefined") return false;
+        return window.localStorage.getItem(INTRO_SEEN_KEY) !== "true";
+    });
     const [activeModel, setActiveModel] = useState({
         expression: initialExpression,
         simplified: initialSimplified,
@@ -691,12 +701,29 @@ User: ${text}
     const graphExpanded = controlsCollapsed && explainCollapsed;
     const tooltipX = isPinned ? pinnedPos.x : hoverInfo?.screenX;
     const tooltipY = isPinned ? pinnedPos.y : hoverInfo?.screenY;
+    const replayIntro = () => {
+        try {
+            window.localStorage.removeItem(INTRO_SEEN_KEY);
+        } catch {
+            // ignore storage failures
+        }
+        setShowIntro(true);
+    };
 
     return (
         <div
             className={`epsilon-delta-lab ${graphExpanded ? "expanded" : ""} ${graphFullscreen ? "graph-fullscreen" : ""}`}
-            dir="rtl"
+            dir={isArabic ? "rtl" : "ltr"}
         >
+            {showIntro && (
+                <LabIntroModal
+                    labId={INTRO_LAB_ID}
+                    slides={LIMITS_INTRO_SLIDES}
+                    accentColor="#3b82f6"
+                    isArabic={isArabic}
+                    onClose={() => setShowIntro(false)}
+                />
+            )}
             <header className="epsilon-header">
                 <div className="epsilon-header-main">
                     <div className="epsilon-badge">
@@ -710,6 +737,10 @@ User: ${text}
                     </div>
                 </div>
                 <div className="epsilon-header-actions">
+                    <button className="epsilon-action-btn ghost" onClick={replayIntro}>
+                        <Info size={16} />
+                        {t("إعادة عرض المقدمة", "Replay Intro")}
+                    </button>
                     <button className="epsilon-action-btn">
                         <Download size={16} />
                         تحميل

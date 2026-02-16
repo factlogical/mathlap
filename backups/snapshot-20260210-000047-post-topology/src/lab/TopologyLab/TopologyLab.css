@@ -1,0 +1,355 @@
+.topology-lab {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(34, 211, 238, 0.1), transparent 35%),
+    radial-gradient(circle at 85% 15%, rgba(16, 185, 129, 0.09), transparent 36%),
+    linear-gradient(135deg, #050b1a 0%, #071126 52%, #050b1a 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  overflow: hidden;
+}
+
+.topology-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px 2px;
+}
+
+.topology-header h2 {
+  margin: 0;
+  font-size: 1.06rem;
+  letter-spacing: 0.01em;
+  color: #e2e8f0;
+}
+
+.topology-header p {
+  margin: 3px 0 0;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.topology-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  background: rgba(14, 116, 144, 0.25);
+  border: 1px solid rgba(34, 211, 238, 0.34);
+  color: #67e8f9;
+  font-size: 0.76rem;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+.topology-split-container {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.topology-pane {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(51, 65, 85, 0.75);
+  background: rgba(2, 8, 23, 0.62);
+}
+
+.topology-pane-header {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.topology-pane-header h3 {
+  margin: 0;
+  font-size: 0.94rem;
+  color: #dbeafe;
+}
+
+.topology-pane-header span {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.topology-pane-body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.topology-curve-canvas-wrap,
+.topology-surface-wrap {
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  position: relative;
+}
+
+.topology-curve-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.topology-curve-canvas.is-drawing {
+  cursor: cell;
+}
+
+.topology-surface-empty {
+  position: absolute;
+  inset: auto 14px 14px 14px;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(15, 23, 42, 0.84);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  color: #a5b4fc;
+  font-size: 0.78rem;
+}
+
+.topology-bottom-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+  gap: 12px;
+  min-height: 210px;
+}
+
+.topology-controls,
+.topology-chat {
+  min-height: 0;
+  border-radius: 14px;
+  border: 1px solid rgba(51, 65, 85, 0.75);
+  background: rgba(2, 8, 23, 0.75);
+}
+
+.topology-controls {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.topology-controls-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.topology-controls-row label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #9fbad4;
+}
+
+.topology-controls-row select,
+.topology-controls-row input[type="range"] {
+  width: 100%;
+}
+
+.topology-controls-row select {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  background: rgba(15, 23, 42, 0.72);
+  color: #f8fafc;
+  outline: none;
+}
+
+.topology-controls-buttons {
+  flex-direction: row;
+  gap: 8px;
+}
+
+.topology-controls-buttons button {
+  flex: 1;
+}
+
+.topology-controls button {
+  padding: 8px 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.95));
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.topology-controls button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.65);
+  color: #ccfbf1;
+}
+
+.topology-controls button.active {
+  border-color: rgba(251, 191, 36, 0.75);
+  color: #fde68a;
+}
+
+.topology-controls input[type="range"] {
+  accent-color: #22d3ee;
+}
+
+.topology-controls-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topology-controls-toggles label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: #cbd5e1;
+}
+
+.topology-stats {
+  border-top: 1px solid rgba(51, 65, 85, 0.8);
+  padding-top: 8px;
+  display: grid;
+  gap: 4px;
+  color: #cbd5e1;
+  font-size: 0.84rem;
+}
+
+.topology-stats h4 {
+  margin: 0 0 2px;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+}
+
+.topology-chat {
+  display: flex;
+  flex-direction: column;
+}
+
+.topology-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.75);
+}
+
+.topology-chat-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #dbeafe;
+}
+
+.topology-chat-header span {
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.topology-chat-feed {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.topology-chat-message {
+  border: 1px solid rgba(51, 65, 85, 0.72);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #e2e8f0;
+  display: grid;
+  gap: 6px;
+}
+
+.topology-chat-message.user {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(6, 78, 59, 0.28);
+}
+
+.topology-chat-message.assistant {
+  border-color: rgba(14, 165, 233, 0.4);
+  background: rgba(7, 89, 133, 0.22);
+}
+
+.topology-chat-message.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.topology-chat-hint {
+  font-size: 0.8rem;
+  color: #bae6fd;
+}
+
+.topology-chat-action {
+  justify-self: start;
+  border-radius: 8px;
+  padding: 6px 9px;
+  font-size: 0.76rem;
+  border: 1px solid rgba(14, 165, 233, 0.45);
+  background: rgba(14, 116, 144, 0.28);
+  color: #dbeafe;
+  cursor: pointer;
+}
+
+.topology-chat-input {
+  border-top: 1px solid rgba(51, 65, 85, 0.75);
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.topology-chat-input input {
+  border-radius: 10px;
+  border: 1px solid rgba(71, 85, 105, 0.7);
+  background: rgba(15, 23, 42, 0.85);
+  color: #f8fafc;
+  padding: 8px 10px;
+  outline: none;
+}
+
+.topology-chat-input button {
+  border-radius: 10px;
+  border: 1px solid rgba(34, 211, 238, 0.54);
+  background: rgba(14, 116, 144, 0.36);
+  color: #e0f2fe;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.topology-chat-input button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1240px) {
+  .topology-split-container {
+    grid-template-columns: 1fr;
+  }
+
+  .topology-bottom-panel {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -145,7 +145,7 @@ export default function DerivativeCanvas3D({
                     [1, "#93c5fd"]
                 ],
                 opacity: highlight === "surface" ? 0.95 : 0.84,
-                name: "Surface",
+                name: "السطح",
                 showscale: false,
                 contours: {
                     z: {
@@ -180,7 +180,7 @@ export default function DerivativeCanvas3D({
                     k: [2, 3],
                     color: highlight === "plane" ? "#f59e0b" : "#fb7185",
                     opacity: highlight === "plane" ? 0.68 : 0.52,
-                    name: "Tangent Plane",
+                    name: "المستوى المماسي",
                     flatshading: true
                 });
             }
@@ -192,7 +192,7 @@ export default function DerivativeCanvas3D({
                 y: [point.y],
                 z: [point.z],
                 marker: { size: 7, color: "#f472b6", line: { color: "#ffffff", width: 1.5 } },
-                name: "Touch Point",
+                name: "نقطة التماس",
                 hovertemplate: "a=%{x:.3f}<br>b=%{y:.3f}<br>z=%{z:.3f}<extra></extra>"
             });
 
@@ -212,7 +212,7 @@ export default function DerivativeCanvas3D({
                     z: [point.z, normalEnd.z],
                     line: { color: normalColor, width: highlight === "normal" ? 8 : 6 },
                     marker: { size: 2, color: normalColor },
-                    name: "Normal"
+                    name: "المتجه العمودي"
                 });
 
                 traces.push({
@@ -228,7 +228,7 @@ export default function DerivativeCanvas3D({
                     anchor: "tip",
                     colorscale: [[0, normalColor], [1, normalColor]],
                     showscale: false,
-                    name: "Normal Tip"
+                    name: "رأس المتجه العمودي"
                 });
             }
         }

@@ -5,7 +5,7 @@ function detectDirection(text) {
 }
 
 export default function DerivativeChat({
-    title = "Derivative Chat",
+    title = "شات المشتقة",
     messages,
     onSendMessage,
     onQuickAction,
@@ -44,15 +44,15 @@ export default function DerivativeChat({
             <div className="derivative-chat-header">
                 <h3>{title}</h3>
                 <div className="derivative-chat-header-actions">
-                    <span>{isAnimating ? "Animating" : "Ready"}</span>
+                    <span>{isAnimating ? "جارٍ التحريك" : "جاهز"}</span>
                     {onClose && (
                         <button
                             type="button"
                             className="derivative-chat-close-btn"
                             onClick={onClose}
-                            title="Close chat"
+                            title="إغلاق الشات"
                         >
-                            Close
+                            إغلاق
                         </button>
                     )}
                 </div>
@@ -88,7 +88,7 @@ export default function DerivativeChat({
                                             disabled={isAnimating}
                                             onClick={() => onQuickAction(s.action)}
                                         >
-                                            {s.label || "Apply"}
+                                            {s.label || "تطبيق"}
                                         </button>
                                     ))}
                                 </div>
@@ -96,7 +96,7 @@ export default function DerivativeChat({
                         </div>
                     );
                 })}
-                {loading && <div className="typing derivative-typing">Analyzing...</div>}
+                {loading && <div className="typing derivative-typing">جارٍ التحليل...</div>}
             </div>
 
             <div className="input-area derivative-input-area">
@@ -104,11 +104,11 @@ export default function DerivativeChat({
                     value={input}
                     onChange={(event) => setInput(event.target.value)}
                     onKeyDown={(event) => event.key === "Enter" && handleSend()}
-                    placeholder="Example: plot sin(x), move h, mode 3D..."
+                    placeholder="مثال: ارسم sin(x)، حرّك h، غيّر إلى وضع 3D..."
                     disabled={loading || isAnimating}
                 />
                 <button type="button" onClick={handleSend} disabled={loading || !input.trim() || isAnimating}>
-                    Send
+                    إرسال
                 </button>
             </div>
         </div>

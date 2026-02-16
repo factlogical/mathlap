@@ -1,0 +1,56 @@
+/* App.css - Minimal styles (main styles are in index.css) */
+
+@keyframes slideInUp {
+  0% {
+    transform: translateY(50px) scale(0.9);
+    opacity: 0;
+  }
+
+  60% {
+    transform: translateY(-10px) scale(1.02);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes messagePop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.chat-window-enter {
+  animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.message-enter {
+  animation: messagePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Scrollbar Hiding Utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.lab-module-card {
+  min-width: 180px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}

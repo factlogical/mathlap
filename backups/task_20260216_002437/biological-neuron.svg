@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#081633"/>
+      <stop offset="100%" stop-color="#10224a"/>
+    </linearGradient>
+    <radialGradient id="soma" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#93c5fd"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </radialGradient>
+  </defs>
+  <rect width="720" height="720" fill="url(#bg)"/>
+  <g stroke="#60a5fa" stroke-width="10" fill="none" stroke-linecap="round">
+    <path d="M350 330 C270 280, 220 220, 160 170"/>
+    <path d="M350 340 C250 350, 180 320, 100 300"/>
+    <path d="M350 350 C250 400, 180 450, 120 510"/>
+    <path d="M360 320 C420 260, 500 220, 580 180"/>
+    <path d="M360 340 C470 330, 560 330, 640 330"/>
+    <path d="M360 360 C470 390, 560 450, 630 520"/>
+  </g>
+  <g stroke="#22d3ee" stroke-width="14" fill="none" stroke-linecap="round">
+    <path d="M390 360 C470 365, 520 370, 650 370"/>
+    <path d="M650 370 C680 370, 695 355, 705 340"/>
+  </g>
+  <g fill="#f59e0b">
+    <circle cx="610" cy="388" r="9"/>
+    <circle cx="632" cy="388" r="9"/>
+    <circle cx="654" cy="388" r="9"/>
+    <circle cx="676" cy="388" r="9"/>
+  </g>
+  <circle cx="360" cy="350" r="72" fill="url(#soma)" stroke="#bfdbfe" stroke-width="6"/>
+  <circle cx="344" cy="340" r="24" fill="#0f172a" stroke="#38bdf8" stroke-width="4"/>
+  <g fill="#dbeafe" font-family="Segoe UI, Arial" font-size="30" font-weight="700">
+    <text x="58" y="118">Biological Neuron</text>
+  </g>
+</svg>
+

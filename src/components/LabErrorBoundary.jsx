@@ -4,7 +4,7 @@ import { AlertTriangle, RotateCw } from 'lucide-react';
 class LabErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { hasError: false, error: null };
+        this.state = { hasError: false, error: null, retryNonce: 0 };
     }
 
     static getDerivedStateFromError(error) {
@@ -15,6 +15,23 @@ class LabErrorBoundary extends React.Component {
         console.error("Lab Module Error:", error, errorInfo);
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.resetKey !== prevProps.resetKey && this.state.hasError) {
+            this.setState({ hasError: false, error: null });
+        }
+    }
+
+    handleRetry = () => {
+        this.setState((prev) => ({
+            hasError: false,
+            error: null,
+            retryNonce: prev.retryNonce + 1
+        }));
+        if (typeof this.props.onRetry === "function") {
+            this.props.onRetry();
+        }
+    };
+
     render() {
         if (this.state.hasError) {
             return (
@@ -24,10 +41,10 @@ class LabErrorBoundary extends React.Component {
                             <AlertTriangle size={32} className="text-[var(--error)]" />
                         </div>
                         <h3 className="text-lg font-semibold mb-2 text-[var(--text-primary)]">
-                            Module Error
+                            {this.props.title || "حدث خطأ داخل المختبر"}
                         </h3>
                         <p className="text-sm text-[var(--text-muted)] mb-4">
-                            This lab module encountered an error and cannot be displayed.
+                            {this.props.message || "حدث خطأ، جرّب التحديث أو أعد المحاولة."}
                         </p>
                         <div className="p-3 rounded-lg bg-[var(--bg-surface)] mb-4">
                             <code className="text-xs text-[var(--error)] font-mono">
@@ -35,18 +52,18 @@ class LabErrorBoundary extends React.Component {
                             </code>
                         </div>
                         <button
-                            onClick={() => window.location.reload()}
+                            onClick={this.handleRetry}
                             className="btn btn-secondary inline-flex items-center gap-2"
                         >
                             <RotateCw size={16} />
-                            Reload Application
+                            {this.props.retryLabel || "إعادة المحاولة"}
                         </button>
                     </div>
                 </div>
             );
         }
 
-        return this.props.children;
+        return <React.Fragment key={this.state.retryNonce}>{this.props.children}</React.Fragment>;
     }
 }
 

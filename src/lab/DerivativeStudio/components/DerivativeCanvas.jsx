@@ -43,20 +43,24 @@ export default function DerivativeCanvas({
     presentationMode = false,
     functionLabel = "",
     showInlineMetrics = false,
-    onDragPoint
+    onDragPoint,
+    onViewportTransform
 }) {
     const canvasRef = useRef(null);
     const interactionRef = useRef({
         width: 1,
         height: 1,
         xRange: [-5, 5],
+        yRange: [-2, 10],
         pointA: null,
         pointB: null
     });
     const dragStateRef = useRef({
         active: false,
         type: null,
-        pointerId: null
+        pointerId: null,
+        lastX: 0,
+        lastY: 0
     });
     const [resizeTick, setResizeTick] = useState(0);
 
@@ -132,6 +136,7 @@ export default function DerivativeCanvas({
         interactionRef.current.width = width;
         interactionRef.current.height = height;
         interactionRef.current.xRange = xRange;
+        interactionRef.current.yRange = yRange;
         interactionRef.current.pointA = toCanvas(pointA.x, pointA.y);
         interactionRef.current.pointB = toCanvas(pointB.x, pointB.y);
 
@@ -492,7 +497,7 @@ export default function DerivativeCanvas({
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas || typeof onDragPoint !== "function") return;
+        if (!canvas) return;
 
         canvas.style.touchAction = "none";
 
@@ -516,6 +521,14 @@ export default function DerivativeCanvas({
             return activeRange[0] + ratio * (activeRange[1] - activeRange[0]);
         };
 
+        const toWorldY = (py) => {
+            const { height, yRange: activeRange } = interactionRef.current;
+            const safeHeight = Math.max(1, height);
+            const yLocal = clamp(py, 0, safeHeight);
+            const ratio = 1 - yLocal / safeHeight;
+            return activeRange[0] + ratio * (activeRange[1] - activeRange[0]);
+        };
+
         const getLocalPoint = (event) => {
             const rect = canvas.getBoundingClientRect();
             return {
@@ -526,17 +539,19 @@ export default function DerivativeCanvas({
 
         const setHoverCursor = (x, y) => {
             const pointType = pickPointType(x, y);
-            canvas.style.cursor = pointType ? "grab" : "default";
+            canvas.style.cursor = pointType ? "grab" : "move";
         };
 
         const onPointerDown = (event) => {
             const p = getLocalPoint(event);
             const pointType = pickPointType(p.x, p.y);
-            if (!pointType) return;
+            const isPointDrag = pointType && typeof onDragPoint === "function";
             dragStateRef.current = {
                 active: true,
-                type: pointType,
-                pointerId: event.pointerId
+                type: isPointDrag ? pointType : "pan",
+                pointerId: event.pointerId,
+                lastX: p.x,
+                lastY: p.y
             };
             canvas.style.cursor = "grabbing";
             canvas.setPointerCapture(event.pointerId);
@@ -551,8 +566,29 @@ export default function DerivativeCanvas({
                 return;
             }
             if (drag.pointerId !== event.pointerId) return;
+            if (drag.type === "pan") {
+                const { xRange: activeX, yRange: activeY, width, height } = interactionRef.current;
+                const safeWidth = Math.max(1, width);
+                const safeHeight = Math.max(1, height);
+                const dx = p.x - drag.lastX;
+                const dy = p.y - drag.lastY;
+                dragStateRef.current.lastX = p.x;
+                dragStateRef.current.lastY = p.y;
+
+                if (typeof onViewportTransform === "function") {
+                    const dxWorld = (dx / safeWidth) * (activeX[1] - activeX[0]);
+                    const dyWorld = (dy / safeHeight) * (activeY[1] - activeY[0]);
+                    onViewportTransform({
+                        kind: "pan",
+                        dx: -dxWorld,
+                        dy: dyWorld
+                    });
+                }
+                return;
+            }
+
             const worldX = toWorldX(p.x);
-            onDragPoint({
+            onDragPoint?.({
                 type: drag.type,
                 x: worldX
             });
@@ -579,11 +615,26 @@ export default function DerivativeCanvas({
             }
         };
 
+        const onWheel = (event) => {
+            if (typeof onViewportTransform !== "function") return;
+            event.preventDefault();
+            const p = getLocalPoint(event);
+            const anchorX = toWorldX(p.x);
+            const anchorY = toWorldY(p.y);
+            onViewportTransform({
+                kind: "zoom",
+                factor: event.deltaY > 0 ? 1.1 : 0.9,
+                anchorX,
+                anchorY
+            });
+        };
+
         canvas.addEventListener("pointerdown", onPointerDown);
         canvas.addEventListener("pointermove", onPointerMove);
         canvas.addEventListener("pointerup", onPointerEnd);
         canvas.addEventListener("pointercancel", onPointerEnd);
         canvas.addEventListener("pointerleave", onPointerLeave);
+        canvas.addEventListener("wheel", onWheel, { passive: false });
 
         return () => {
             canvas.removeEventListener("pointerdown", onPointerDown);
@@ -591,9 +642,10 @@ export default function DerivativeCanvas({
             canvas.removeEventListener("pointerup", onPointerEnd);
             canvas.removeEventListener("pointercancel", onPointerEnd);
             canvas.removeEventListener("pointerleave", onPointerLeave);
+            canvas.removeEventListener("wheel", onWheel);
             canvas.style.cursor = "default";
         };
-    }, [onDragPoint]);
+    }, [onDragPoint, onViewportTransform]);
 
     return <canvas ref={canvasRef} className="derivative-canvas" />;
 }

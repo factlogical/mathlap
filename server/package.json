@@ -8,9 +8,13 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "openai": "^4.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.2.1",
+    "openai": "^4.0.0"
+  },
+  "overrides": {
+    "qs": "^6.15.0"
   }
 }

@@ -1,0 +1,87 @@
+﻿<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">NEAT Species Evolution Dashboard</title>
+  <desc id="desc">Illustration of generations, species diversity, and best fitness trend for NEAT.</desc>
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#041226"/>
+      <stop offset="100%" stop-color="#0d1e39"/>
+    </linearGradient>
+    <linearGradient id="fitnessLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#86efac"/>
+    </linearGradient>
+    <linearGradient id="speciesArea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="800" rx="40" fill="url(#bg2)"/>
+
+  <g stroke="#1e3a5f" stroke-width="1" opacity="0.45">
+    <path d="M90 120H720"/>
+    <path d="M90 200H720"/>
+    <path d="M90 280H720"/>
+    <path d="M90 360H720"/>
+    <path d="M90 440H720"/>
+    <path d="M90 520H720"/>
+    <path d="M90 600H720"/>
+    <path d="M90 680H720"/>
+    <path d="M90 120V680"/>
+    <path d="M170 120V680"/>
+    <path d="M250 120V680"/>
+    <path d="M330 120V680"/>
+    <path d="M410 120V680"/>
+    <path d="M490 120V680"/>
+    <path d="M570 120V680"/>
+    <path d="M650 120V680"/>
+    <path d="M730 120V680"/>
+  </g>
+
+  <path d="M90 560 L170 520 L250 505 L330 470 L410 430 L490 390 L570 340 L650 285 L730 230 L730 680 L90 680 Z"
+        fill="url(#speciesArea)"/>
+
+  <path d="M90 540 L170 500 L250 470 L330 430 L410 390 L490 330 L570 285 L650 215 L730 165"
+        stroke="url(#fitnessLine)" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g fill="#22c55e" stroke="#dcfce7" stroke-width="2">
+    <circle cx="90" cy="540" r="7"/>
+    <circle cx="170" cy="500" r="7"/>
+    <circle cx="250" cy="470" r="7"/>
+    <circle cx="330" cy="430" r="7"/>
+    <circle cx="410" cy="390" r="7"/>
+    <circle cx="490" cy="330" r="7"/>
+    <circle cx="570" cy="285" r="7"/>
+    <circle cx="650" cy="215" r="7"/>
+    <circle cx="730" cy="165" r="7"/>
+  </g>
+
+  <g font-family="JetBrains Mono, Consolas, monospace" fill="#cbd5e1" font-size="20">
+    <text x="92" y="92">Generation Metrics</text>
+    <text x="92" y="712">G0</text>
+    <text x="320" y="712">G40</text>
+    <text x="540" y="712">G80</text>
+    <text x="690" y="712">G120</text>
+  </g>
+
+  <g>
+    <rect x="95" y="140" width="250" height="120" rx="14" fill="#0b2345" stroke="#1f3c63"/>
+    <text x="120" y="175" font-family="JetBrains Mono, Consolas, monospace" fill="#e2e8f0" font-size="18">Best Fitness</text>
+    <text x="120" y="214" font-family="JetBrains Mono, Consolas, monospace" fill="#4ade80" font-size="36">1429.6</text>
+
+    <rect x="360" y="140" width="165" height="120" rx="14" fill="#0b2345" stroke="#1f3c63"/>
+    <text x="378" y="175" font-family="JetBrains Mono, Consolas, monospace" fill="#e2e8f0" font-size="18">Species</text>
+    <text x="430" y="225" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" fill="#60a5fa" font-size="42">12</text>
+
+    <rect x="540" y="140" width="165" height="120" rx="14" fill="#0b2345" stroke="#1f3c63"/>
+    <text x="560" y="175" font-family="JetBrains Mono, Consolas, monospace" fill="#e2e8f0" font-size="18">Complexity</text>
+    <text x="622" y="225" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" fill="#fbbf24" font-size="32">18/43</text>
+  </g>
+
+  <g opacity="0.94">
+    <rect x="90" y="40" width="640" height="60" rx="12" fill="#0b2345" stroke="#1f3c63"/>
+    <text x="410" y="78" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="24" fill="#7dd3fc">
+      Neuroevolution Progress Dashboard
+    </text>
+  </g>
+</svg>

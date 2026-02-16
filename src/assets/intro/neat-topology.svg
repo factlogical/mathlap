@@ -1,0 +1,88 @@
+﻿<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">NEAT Topology Evolution</title>
+  <desc id="desc">Illustration of evolving neural topology with new hidden nodes and weighted links.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#061226"/>
+      <stop offset="100%" stop-color="#0a1733"/>
+    </linearGradient>
+    <linearGradient id="linePos" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="lineNeg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f87171"/>
+      <stop offset="100%" stop-color="#fb7185"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="800" height="800" rx="40" fill="url(#bg)"/>
+
+  <g opacity="0.35" stroke="#1e3a5f" stroke-width="1">
+    <path d="M100 120H700"/>
+    <path d="M100 240H700"/>
+    <path d="M100 360H700"/>
+    <path d="M100 480H700"/>
+    <path d="M100 600H700"/>
+    <path d="M100 720H700"/>
+  </g>
+
+  <g fill="none" stroke-linecap="round">
+    <path d="M150 200 L340 160" stroke="url(#linePos)" stroke-width="5" opacity="0.82"/>
+    <path d="M150 320 L340 330" stroke="url(#lineNeg)" stroke-width="4" opacity="0.74"/>
+    <path d="M150 460 L340 330" stroke="url(#linePos)" stroke-width="4" opacity="0.68"/>
+    <path d="M150 580 L340 520" stroke="url(#lineNeg)" stroke-width="3.8" opacity="0.7"/>
+
+    <path d="M340 160 L520 230" stroke="url(#linePos)" stroke-width="5" opacity="0.88"/>
+    <path d="M340 330 L520 230" stroke="url(#lineNeg)" stroke-width="4" opacity="0.65"/>
+    <path d="M340 330 L520 390" stroke="url(#linePos)" stroke-width="5" opacity="0.86"/>
+    <path d="M340 520 L520 390" stroke="url(#lineNeg)" stroke-width="4" opacity="0.62"/>
+
+    <path d="M520 230 L650 320" stroke="url(#linePos)" stroke-width="5" opacity="0.88"/>
+    <path d="M520 390 L650 320" stroke="url(#linePos)" stroke-width="4.5" opacity="0.82"/>
+  </g>
+
+  <g filter="url(#glow)">
+    <circle cx="150" cy="200" r="22" fill="#38bdf8" stroke="#dbeafe" stroke-width="3"/>
+    <circle cx="150" cy="320" r="22" fill="#38bdf8" stroke="#dbeafe" stroke-width="3"/>
+    <circle cx="150" cy="460" r="22" fill="#38bdf8" stroke="#dbeafe" stroke-width="3"/>
+    <circle cx="150" cy="580" r="22" fill="#38bdf8" stroke="#dbeafe" stroke-width="3"/>
+
+    <circle cx="340" cy="160" r="20" fill="#8b5cf6" stroke="#ddd6fe" stroke-width="3"/>
+    <circle cx="340" cy="330" r="20" fill="#8b5cf6" stroke="#ddd6fe" stroke-width="3"/>
+    <circle cx="340" cy="520" r="20" fill="#8b5cf6" stroke="#ddd6fe" stroke-width="3"/>
+
+    <circle cx="520" cy="230" r="18" fill="#a855f7" stroke="#e9d5ff" stroke-width="3"/>
+    <circle cx="520" cy="390" r="18" fill="#a855f7" stroke="#e9d5ff" stroke-width="3"/>
+
+    <circle cx="650" cy="320" r="24" fill="#10b981" stroke="#d1fae5" stroke-width="3"/>
+  </g>
+
+  <g font-family="JetBrains Mono, Consolas, monospace" fill="#e2e8f0" font-size="24">
+    <text x="92" y="92">Input</text>
+    <text x="286" y="92">Hidden</text>
+    <text x="606" y="92">Output</text>
+  </g>
+
+  <g fill="#93c5fd" font-family="JetBrains Mono, Consolas, monospace" font-size="18">
+    <text x="120" y="210">x1</text>
+    <text x="120" y="330">x2</text>
+    <text x="120" y="470">x3</text>
+    <text x="120" y="590">x4</text>
+    <text x="637" y="327">y</text>
+  </g>
+
+  <g opacity="0.95">
+    <rect x="80" y="670" width="640" height="70" rx="12" fill="#0b2345" stroke="#1f3c63"/>
+    <text x="400" y="713" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="24" fill="#7dd3fc">
+      Topology grows with innovation and mutation
+    </text>
+  </g>
+</svg>

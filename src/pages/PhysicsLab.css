@@ -1,0 +1,355 @@
+.physics-shell {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.62rem;
+  padding: 0.62rem;
+  background:
+    radial-gradient(860px 420px at 8% 8%, rgba(56, 189, 248, 0.12), transparent 62%),
+    radial-gradient(780px 360px at 92% 12%, rgba(16, 185, 129, 0.1), transparent 60%),
+    linear-gradient(140deg, rgba(7, 12, 24, 0.98), rgba(5, 10, 19, 0.98));
+  overflow: hidden;
+}
+
+.physics-shell--intro .physics-header,
+.physics-shell--intro .physics-guide-card,
+.physics-shell--intro .physics-guide-restore,
+.physics-shell--intro .physics-stage {
+  filter: blur(2px);
+  transform: scale(0.995);
+}
+
+.physics-header {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(320px, 1.45fr);
+  align-items: center;
+  gap: 0.8rem;
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  border-radius: 12px;
+  padding: 0.72rem 0.88rem;
+  background: linear-gradient(140deg, rgba(15, 23, 42, 0.84), rgba(10, 20, 36, 0.84));
+  backdrop-filter: blur(6px);
+}
+
+.physics-title-wrap h2 {
+  margin: 0 0 0.2rem;
+  font-size: 1.02rem;
+  color: #e2e8f0;
+}
+
+.physics-title-wrap p {
+  margin: 0;
+  color: #9eb0c8;
+  font-size: 0.83rem;
+}
+
+.physics-tabs {
+  display: flex;
+  gap: 0.52rem;
+  justify-content: flex-end;
+}
+
+.physics-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 290px;
+  border: 1px solid rgba(71, 85, 105, 0.76);
+  border-radius: 10px;
+  padding: 0.46rem 0.62rem;
+  background: rgba(22, 33, 53, 0.68);
+  color: #dbe5f3;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.physics-tab:hover {
+  transform: translateY(-1px);
+  border-color: rgba(34, 211, 238, 0.82);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2), 0 8px 20px rgba(2, 132, 199, 0.14);
+}
+
+.physics-tab.active {
+  border-color: rgba(34, 211, 238, 0.95);
+  background: linear-gradient(145deg, rgba(7, 56, 84, 0.95), rgba(17, 94, 126, 0.4));
+}
+
+.physics-tab-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.65);
+  color: #67e8f9;
+}
+
+.physics-tab-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.physics-tab-text strong {
+  font-size: 0.84rem;
+  color: #e6eef8;
+}
+
+.physics-tab-text small {
+  font-size: 0.73rem;
+  color: #9fb1c9;
+}
+
+.physics-guide-card {
+  border: 1px solid rgba(34, 211, 238, 0.42);
+  border-radius: 12px;
+  background: linear-gradient(130deg, rgba(8, 30, 52, 0.84), rgba(11, 45, 36, 0.62));
+  padding: 0.62rem 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.physics-guide-content {
+  min-width: 0;
+}
+
+.physics-guide-content strong {
+  display: block;
+  color: #d4f6ff;
+  margin-bottom: 0.22rem;
+  font-size: 0.88rem;
+}
+
+.physics-guide-content p {
+  margin: 0;
+  color: #b8d5e8;
+  line-height: 1.5;
+  font-size: 0.8rem;
+}
+
+.physics-guide-close,
+.physics-guide-restore {
+  border: 1px solid rgba(56, 189, 248, 0.7);
+  background: rgba(14, 116, 144, 0.24);
+  color: #d9f3ff;
+  border-radius: 8px;
+  padding: 0.4rem 0.62rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.physics-guide-close:hover,
+.physics-guide-restore:hover {
+  background: rgba(14, 116, 144, 0.34);
+  border-color: rgba(34, 211, 238, 0.9);
+}
+
+.physics-guide-restore {
+  align-self: flex-start;
+}
+
+.physics-stage {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid rgba(71, 85, 105, 0.58);
+  border-radius: 12px;
+  background: rgba(6, 13, 27, 0.72);
+  overflow: hidden;
+}
+
+.physics-stage > * {
+  height: 100%;
+  min-height: 0;
+}
+
+.physics-loading {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a7b8cf;
+}
+
+.physics-intro-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at center, rgba(8, 22, 38, 0.5), rgba(5, 10, 20, 0.92));
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.physics-intro-logo {
+  position: relative;
+  width: 94px;
+  height: 94px;
+  animation: physicsIntroSweep 1.3s cubic-bezier(0.17, 0.67, 0.25, 1.05) both;
+}
+
+.physics-intro-ring,
+.physics-intro-wave {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+}
+
+.physics-intro-ring {
+  inset: 0;
+  color: #5eead4;
+  border: 2px solid rgba(94, 234, 212, 0.76);
+  background: radial-gradient(circle at 30% 30%, rgba(14, 116, 144, 0.6), rgba(8, 47, 73, 0.2));
+  box-shadow: 0 0 0 8px rgba(14, 116, 144, 0.12), 0 0 36px rgba(34, 211, 238, 0.34);
+}
+
+.physics-intro-ring--core {
+  animation: physicsIntroPulse 1.5s ease-in-out infinite;
+}
+
+.physics-intro-ring--orbit {
+  inset: -12px;
+  border: 1px dashed rgba(125, 211, 252, 0.85);
+  background: transparent;
+  box-shadow: none;
+  animation: physicsIntroSpin 2.2s linear infinite reverse;
+}
+
+.physics-intro-wave {
+  width: 30px;
+  height: 30px;
+  top: -8px;
+  inset-inline-end: -10px;
+  color: #bae6fd;
+  background: rgba(14, 165, 233, 0.22);
+  border: 1px solid rgba(56, 189, 248, 0.75);
+  animation: physicsIntroSpin 1.6s linear infinite;
+}
+
+.physics-intro-text {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.2rem;
+  justify-items: center;
+}
+
+.physics-intro-text strong {
+  font-size: 1rem;
+  color: #e0f2fe;
+}
+
+.physics-intro-text small {
+  color: #8ec5df;
+  font-size: 0.8rem;
+}
+
+@keyframes physicsIntroSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-36vw) rotate(-18deg) scale(0.58);
+  }
+  55% {
+    opacity: 1;
+    transform: translateX(1.2vw) rotate(6deg) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes physicsIntroSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes physicsIntroPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(14, 116, 144, 0.12), 0 0 36px rgba(34, 211, 238, 0.34);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 12px rgba(14, 116, 144, 0.1), 0 0 44px rgba(34, 211, 238, 0.42);
+  }
+}
+
+@media (max-width: 1100px) {
+  .physics-header {
+    grid-template-columns: 1fr;
+  }
+
+  .physics-tabs {
+    justify-content: flex-start;
+  }
+
+  .physics-tab {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .physics-guide-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+html[data-theme="light"] .physics-shell {
+  background:
+    radial-gradient(860px 420px at 8% 8%, rgba(2, 132, 199, 0.14), transparent 62%),
+    radial-gradient(780px 360px at 92% 12%, rgba(16, 185, 129, 0.1), transparent 60%),
+    linear-gradient(140deg, #f5f9ff, #e8f1fb);
+}
+
+html[data-theme="light"] .physics-header,
+html[data-theme="light"] .physics-guide-card,
+html[data-theme="light"] .physics-stage {
+  border-color: rgba(148, 163, 184, 0.56);
+}
+
+html[data-theme="light"] .physics-header,
+html[data-theme="light"] .physics-stage {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+html[data-theme="light"] .physics-guide-card {
+  background: linear-gradient(130deg, rgba(218, 240, 255, 0.88), rgba(225, 246, 239, 0.8));
+}
+
+html[data-theme="light"] .physics-title-wrap h2,
+html[data-theme="light"] .physics-tab-text strong,
+html[data-theme="light"] .physics-guide-content strong {
+  color: #0f172a;
+}
+
+html[data-theme="light"] .physics-title-wrap p,
+html[data-theme="light"] .physics-tab-text small,
+html[data-theme="light"] .physics-guide-content p,
+html[data-theme="light"] .physics-loading {
+  color: #455a75;
+}
+
+html[data-theme="light"] .physics-tab {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  border-color: rgba(148, 163, 184, 0.72);
+}
+
+html[data-theme="light"] .physics-guide-close,
+html[data-theme="light"] .physics-guide-restore {
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f172a;
+  border-color: rgba(14, 165, 233, 0.58);
+}

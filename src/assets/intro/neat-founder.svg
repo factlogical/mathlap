@@ -1,0 +1,44 @@
+﻿<svg width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(320 220) rotate(90) scale(420)">
+      <stop stop-color="#132444"/>
+      <stop offset="1" stop-color="#050b17"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="120" y1="100" x2="520" y2="540" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="640" height="640" rx="40" fill="url(#bg)"/>
+
+  <circle cx="320" cy="300" r="210" fill="#0B1324" stroke="url(#ring)" stroke-width="8"/>
+
+  <circle cx="320" cy="250" r="82" fill="#334155"/>
+  <path d="M196 420C196 351 251 296 320 296C389 296 444 351 444 420V470H196V420Z" fill="#475569"/>
+  <path d="M268 240C278 198 312 176 356 189" stroke="#64748B" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="286" cy="248" r="5" fill="#0F172A"/>
+  <circle cx="354" cy="248" r="5" fill="#0F172A"/>
+  <path d="M293 281C307 297 334 297 347 281" stroke="#94A3B8" stroke-width="6" stroke-linecap="round"/>
+
+  <g opacity="0.88">
+    <circle cx="145" cy="140" r="8" fill="#22C55E"/>
+    <circle cx="202" cy="126" r="8" fill="#38BDF8"/>
+    <circle cx="188" cy="185" r="8" fill="#A78BFA"/>
+    <path d="M145 140L202 126L188 185L145 140" stroke="#475569" stroke-width="2"/>
+  </g>
+
+  <g opacity="0.88">
+    <circle cx="506" cy="160" r="8" fill="#38BDF8"/>
+    <circle cx="554" cy="194" r="8" fill="#A78BFA"/>
+    <circle cx="510" cy="238" r="8" fill="#22C55E"/>
+    <path d="M506 160L554 194L510 238L506 160" stroke="#475569" stroke-width="2"/>
+  </g>
+
+  <text x="320" y="548" text-anchor="middle" fill="#E2E8F0" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">
+    Kenneth O. Stanley
+  </text>
+  <text x="320" y="580" text-anchor="middle" fill="#93C5FD" font-family="Inter, Arial, sans-serif" font-size="18">
+    NEAT co-creator (2002)
+  </text>
+</svg>

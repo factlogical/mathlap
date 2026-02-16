@@ -1,6 +1,9 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Info, Maximize2, Minimize2, MessageSquare, SlidersHorizontal } from "lucide-react";
 import { create, all } from "mathjs";
+import { useUISettings } from "../../context/UISettingsContext.jsx";
+import LabIntroModal from "../../components/shared/LabIntroModal";
+import { DERIVATIVE_INTRO_SLIDES } from "../../components/shared/introSlides";
 import DerivativeCanvas from "./components/DerivativeCanvas";
 import DerivativeCanvas3D from "./components/DerivativeCanvas3D";
 import DerivativeChat from "./components/DerivativeChat";
@@ -8,6 +11,7 @@ import ControlPanel from "./components/ControlPanel";
 import { buildEngine, calculateData } from "./utils/derivativeEngine";
 import { buildEngine3D, calculateTangentPlane } from "./utils/derivative3DEngine";
 import { normalizeFunctionExpression, validateAction } from "./utils/actionValidator";
+import { apiUrl, isOffline } from "../../config/api.js";
 import "./DerivativeStudio.css";
 
 const math = create(all);
@@ -71,6 +75,8 @@ const AR_DERIVATIVE_DRAW_RE = /^(?:\u0627\u0631\u0633\u0645|\u0627\u0639\u0631\u
 const AR_DERIVATIVE_ONLY_RE = /^(?:\u0645\u0634\u062a\u0642(?:\u0629|\u0647)?|\u0627\u0634\u062a\u0642)(?:\s+\u062f\u0627\u0644\u0629)?\s+(.+)$/i;
 const AR_PLOT_FN_RE = /^(?:\u0627\u0631\u0633\u0645|\u0627\u0639\u0631\u0636|\u0627\u0638\u0647\u0631)\s+(?:\u062f\u0627\u0644\u0629\s+)?(.+)$/i;
 const GUIDE_DISABLED_KEY = "derivative_studio_fullscreen_guide_disabled_v1";
+const INTRO_LAB_ID = "derivative";
+const INTRO_SEEN_KEY = `${INTRO_LAB_ID}_intro_seen`;
 const FULLSCREEN_GUIDE_CARDS = {
     "2D": [
         {
@@ -86,7 +92,7 @@ const FULLSCREEN_GUIDE_CARDS = {
         {
             id: "triangle",
             title: "Delta Triangle",
-            text: "The dashed triangle encodes Δx = h and Δy = f(a+h)-f(a)."
+            text: "The dashed triangle encodes ?x = h and ?y = f(a+h)-f(a)."
         },
         {
             id: "points",
@@ -123,25 +129,33 @@ function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
+function normalizeRange(min, max, minSpan, maxSpan) {
+    const center = (min + max) * 0.5;
+    const span = clamp(Math.abs(max - min), minSpan, maxSpan);
+    return [center - span * 0.5, center + span * 0.5];
+}
+
 function normalizeArabicInput(text) {
     return String(text || "")
         .toLowerCase()
-        .replace(/[ÙŽÙ‘Ù‹ÙÙŒÙÙÙ’Ù€]/g, "")
-        .replace(/[Ø£Ø¥Ø¢]/g, "Ø§")
-        .replace(/Ù‰/g, "ÙŠ")
-        .replace(/Ø©/g, "Ù‡");
+        .replace(/[ًٌٍَُِّْـ]/g, "")
+        .replace(/[أإآ]/g, "ا")
+        .replace(/ى/g, "ي")
+        .replace(/ة/g, "ه");
 }
 
 function normalizeMathAliases(raw, mode = "2D") {
     let expr = String(raw || "")
         .replace(/[×]/g, "*")
         .replace(/[÷]/g, "/")
-        .replace(/[−–]/g, "-")
-        .replace(/جتا|جيب\s*تمام/gi, "cos")
-        .replace(/جا/gi, "sin")
-        .replace(/ظا/gi, "tan")
-        .replace(/لوغاريتم|لوغ/gi, "log")
-        .replace(/جذر/gi, "sqrt")
+        .replace(/[\u2212\u2013]/g, "-")
+        .replace(/\u062c\u062a\u0627|\u062c\u064a\u0628\s*\u062a\u0645\u0627\u0645/gi, "cos")
+        .replace(/\u062c\u0627/gi, "sin")
+        .replace(/\u0638\u0627/gi, "tan")
+        .replace(/\u0644\u0648\u063a\u0627\u0631\u064a\u062a\u0645|\u0644\u0648\u063a/gi, "log")
+        .replace(/\u062c\u0630\u0631/gi, "sqrt")
+        .replace(/\u0627\u0644\u0642\u064a\u0645\u0629\s*\u0627\u0644\u0645\u0637\u0644\u0642\u0629/gi, "abs")
+        .replace(/\u0627\u0644\u0645\u0637\u0644\u0642\u0629|\u0645\u0637\u0644\u0642\u0629?/gi, "abs")
         .trim();
 
     if (mode === "3D" && !/\by\b/i.test(expr) && /\bu\b/i.test(expr)) {
@@ -177,8 +191,13 @@ function cleanLocalFunctionExpression(raw) {
     let expr = String(raw).trim();
     expr = expr.replace(/^f\(x\)\s*=\s*/i, "");
     expr = expr.replace(/^y\s*=\s*/i, "");
-    expr = expr.replace(/[â€œâ€"']/g, "").trim();
+    expr = expr.replace(/[“”"']/g, "").trim();
     expr = normalizeMathAliases(expr, "2D");
+    expr = expr
+        .replace(/\|([^|]+)\|/g, "abs($1)")
+        .replace(/\b(abs|sin|cos|tan|log|sqrt|exp)\s*(?:\u0644|\u0644\u0640)\s*([xy])\b/gi, "$1($2)")
+        .replace(/\babs\s*(?:of|\u0644|\u0644\u0640)\s*\(?\s*x\s*\)?/gi, "abs(x)")
+        .replace(/\babs\s*(?:of|\u0644|\u0644\u0640)\s*\(?\s*y\s*\)?/gi, "abs(y)");
     expr = normalizeFunctionExpression(expr);
     expr = maybeWrapSingleFunctionToken(expr);
     if (!expr) return null;
@@ -190,7 +209,7 @@ function cleanLocalFunctionExpression3D(raw) {
     let expr = String(raw).trim();
     expr = expr.replace(/^f\(x,\s*y\)\s*=\s*/i, "");
     expr = expr.replace(/^z\s*=\s*/i, "");
-    expr = expr.replace(/[â€œâ€"']/g, "").trim();
+    expr = expr.replace(/[“”"']/g, "").trim();
     expr = normalizeMathAliases(expr, "3D");
     expr = normalizeFunctionExpression(expr);
     if (!expr) return null;
@@ -216,6 +235,25 @@ function extractDerivativeTarget(rawText, currentFunction) {
     }
 
     return cleanLocalFunctionExpression(target);
+}
+
+function inferRecentDerivativeExpression(messages, currentFunction) {
+    if (!Array.isArray(messages) || messages.length === 0) return null;
+
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+        const msg = messages[i];
+        if (!msg || msg.role !== "user") continue;
+        const content = String(msg.content || "").trim();
+        if (!content || !DERIVATIVE_VERB_RE.test(content)) continue;
+
+        const target = extractDerivativeTarget(content, currentFunction);
+        if (!target) continue;
+
+        const derived = deriveExpressionWrtX(target);
+        if (derived) return derived;
+    }
+
+    return null;
 }
 
 function autoYRangeFor2D(engine, xRange) {
@@ -324,6 +362,7 @@ function adaptActionForCurrentMode(action, currentMode) {
 }
 
 export default function DerivativeStudioRenderer() {
+    const { isArabic, t } = useUISettings();
     const [state, setState] = useState(INITIAL_STATE);
     const [nativeFullscreen, setNativeFullscreen] = useState(false);
     const [fallbackFullscreen, setFallbackFullscreen] = useState(false);
@@ -338,6 +377,13 @@ export default function DerivativeStudioRenderer() {
     });
     const [showFullscreenGuide, setShowFullscreenGuide] = useState(false);
     const [dismissedGuideCards, setDismissedGuideCards] = useState({});
+    const [showIntro, setShowIntro] = useState(() => {
+        try {
+            return window.localStorage.getItem(INTRO_SEEN_KEY) !== "true";
+        } catch {
+            return false;
+        }
+    });
     const rootRef = useRef(null);
 
     const engine2D = useMemo(() => buildEngine(state.func), [state.func]);
@@ -640,8 +686,14 @@ export default function DerivativeStudioRenderer() {
         const t = raw.toLowerCase();
         const ar = normalizeArabicInput(raw);
 
-        if (PRONOUN_PLOT_RE.test(raw) && last2DFunctionRef.current) {
-            return { type: "change_function", params: { func: last2DFunctionRef.current, a: state.a } };
+        if (PRONOUN_PLOT_RE.test(raw)) {
+            const recentDerivative = inferRecentDerivativeExpression(state.messages, state.func);
+            if (recentDerivative) {
+                return { type: "change_function", params: { func: recentDerivative, a: state.a } };
+            }
+            if (last2DFunctionRef.current) {
+                return { type: "change_function", params: { func: last2DFunctionRef.current, a: state.a } };
+            }
         }
 
         const namedToken = raw.match(NAMED_FUNCTION_TOKEN_RE);
@@ -668,10 +720,10 @@ export default function DerivativeStudioRenderer() {
         if (modeMatch) {
             return { type: "set_mode", params: { mode: modeMatch[1].toUpperCase() } };
         }
-        if (/(?:ÙˆØ¶Ø¹|Ù†Ù…Ø·).*(?:3d|Ø«Ù„Ø§Ø«ÙŠ)/.test(ar)) {
+        if (/(?:وضع|نمط).*(?:3d|ثلاثي)/.test(ar)) {
             return { type: "set_mode", params: { mode: "3D" } };
         }
-        if (/(?:ÙˆØ¶Ø¹|Ù†Ù…Ø·).*(?:2d|Ø«Ù†Ø§Ø¦ÙŠ)/.test(ar)) {
+        if (/(?:وضع|نمط).*(?:2d|ثنائي)/.test(ar)) {
             return { type: "set_mode", params: { mode: "2D" } };
         }
 
@@ -684,13 +736,13 @@ export default function DerivativeStudioRenderer() {
         const bm = t.match(/^b\s*(?:=|\s)\s*(-?\d+(?:\.\d+)?)$/);
         if (bm) return { type: "set_b", params: { b: parseFloat(bm[1]) } };
 
-        const arSetH = ar.match(/^(?:Ø§Ø¬Ø¹Ù„|Ø®Ù„ÙŠ)\s*h\s*(?:=|Ø§Ù„Ù‰)?\s*(-?\d+(?:\.\d+)?)$/);
+        const arSetH = ar.match(/^(?:اجعل|خلي)\s*h\s*(?:=|الى)?\s*(-?\d+(?:\.\d+)?)$/);
         if (arSetH) return { type: "set_h", params: { h: parseFloat(arSetH[1]) } };
 
-        const arMoveA = ar.match(/^(?:Ø­Ø±Ùƒ|Ø­Ø±Ù‘Ùƒ)\s*a?\s*(?:Ø§Ù„Ù‰)?\s*(-?\d+(?:\.\d+)?)$/);
+        const arMoveA = ar.match(/^(?:حرك|حرّك)\s*a?\s*(?:الى)?\s*(-?\d+(?:\.\d+)?)$/);
         if (arMoveA) return { type: "move_point", params: { a: parseFloat(arMoveA[1]) } };
 
-        const arMoveB = ar.match(/^(?:Ø­Ø±Ùƒ|Ø­Ø±Ù‘Ùƒ)\s*b\s*(?:Ø§Ù„Ù‰)?\s*(-?\d+(?:\.\d+)?)$/);
+        const arMoveB = ar.match(/^(?:حرك|حرّك)\s*b\s*(?:الى)?\s*(-?\d+(?:\.\d+)?)$/);
         if (arMoveB) return { type: "set_b", params: { b: parseFloat(arMoveB[1]) } };
 
         const eng2DDerivative = raw.match(/derivative\s+of\s+(.+?)\s+at\s+(-?\d+(?:\.\d+)?)/i);
@@ -700,7 +752,7 @@ export default function DerivativeStudioRenderer() {
             if (func && Number.isFinite(a)) return { type: "change_function", params: { func, a } };
         }
 
-        const arDerivative = ar.match(/^Ø§Ø´ØªÙ‚\s+(.+?)\s+Ø¹Ù†Ø¯\s+(-?\d+(?:\.\d+)?)$/);
+        const arDerivative = ar.match(/^اشتق\s+(.+?)\s+عند\s+(-?\d+(?:\.\d+)?)$/);
         if (arDerivative) {
             const func = cleanLocalFunctionExpression(arDerivative[1]);
             const a = parseFloat(arDerivative[2]);
@@ -749,7 +801,7 @@ export default function DerivativeStudioRenderer() {
             if (func3D) return { type: "change_function_3d", params: { func3D, a: state.a, b: state.b } };
         }
 
-        const arSurfaceCmd = ar.match(/^(?:Ø§Ø±Ø³Ù…|Ø§Ø¹Ø±Ø¶)\s+(?:Ø³Ø·Ø­|Ø«Ø±ÙŠ Ø¯ÙŠ|3d)\s+(.+)$/);
+        const arSurfaceCmd = ar.match(/^(?:ارسم|اعرض)\s+(?:سطح|ثري دي|3d)\s+(.+)$/);
         if (arSurfaceCmd) {
             const func3D = cleanLocalFunctionExpression3D(arSurfaceCmd[1]);
             if (func3D) return { type: "change_function_3d", params: { func3D, a: state.a, b: state.b } };
@@ -766,26 +818,26 @@ export default function DerivativeStudioRenderer() {
             if (func) return { type: "change_function", params: { func, a: state.a } };
         }
 
-        if (/^(?:ÙˆØ±Ù†ÙŠ|ÙˆØ±ÙŠÙ†ÙŠ|Ø§Ø±Ù†ÙŠ|Ø§Ø±ÙŠÙ†ÙŠ|Ø§Ø¸Ù‡Ø±|Ø§Ø¹Ø±Ø¶)\s+(?:Ø§Ù„)?Ù‚Ø§Ø·Ø¹$/.test(ar)) {
+        if (/^(?:ورني|وريني|ارني|اريني|اظهر|اعرض)\s+(?:ال)?قاطع$/.test(ar)) {
             return { type: "toggle", params: { element: "secant", show: true } };
         }
-        if (/^(?:ÙˆØ±Ù†ÙŠ|ÙˆØ±ÙŠÙ†ÙŠ|Ø§Ø±Ù†ÙŠ|Ø§Ø±ÙŠÙ†ÙŠ|Ø§Ø¸Ù‡Ø±|Ø§Ø¹Ø±Ø¶)\s+(?:Ø§Ù„)?Ù…Ù…Ø§Ø³$/.test(ar)) {
+        if (/^(?:ورني|وريني|ارني|اريني|اظهر|اعرض)\s+(?:ال)?مماس$/.test(ar)) {
             return { type: "toggle", params: { element: "tangent", show: true } };
         }
-        if (/^(?:ÙˆØ±Ù†ÙŠ|ÙˆØ±ÙŠÙ†ÙŠ|Ø§Ø±Ù†ÙŠ|Ø§Ø±ÙŠÙ†ÙŠ|Ø§Ø¸Ù‡Ø±|Ø§Ø¹Ø±Ø¶)\s+(?:Ø§Ù„)?Ù…Ø«Ù„Ø«$/.test(ar)) {
+        if (/^(?:ورني|وريني|ارني|اريني|اظهر|اعرض)\s+(?:ال)?مثلث$/.test(ar)) {
             return { type: "toggle", params: { element: "triangle", show: true } };
         }
-        if (/^(?:ÙˆØ±Ù†ÙŠ|ÙˆØ±ÙŠÙ†ÙŠ|Ø§Ø±Ù†ÙŠ|Ø§Ø±ÙŠÙ†ÙŠ|Ø§Ø¸Ù‡Ø±|Ø§Ø¹Ø±Ø¶)\s+(?:Ø§Ù„)?Ù…Ø³ØªÙˆÙ‰/.test(ar)) {
+        if (/^(?:ورني|وريني|ارني|اريني|اظهر|اعرض)\s+(?:ال)?مستوى/.test(ar)) {
             return { type: "toggle", params: { element: "plane", show: true } };
         }
-        if (/^(?:ÙˆØ±Ù†ÙŠ|ÙˆØ±ÙŠÙ†ÙŠ|Ø§Ø±Ù†ÙŠ|Ø§Ø±ÙŠÙ†ÙŠ|Ø§Ø¸Ù‡Ø±|Ø§Ø¹Ø±Ø¶)\s+(?:Ø§Ù„)?Ø¹Ù…ÙˆØ¯ÙŠ/.test(ar)) {
+        if (/^(?:ورني|وريني|ارني|اريني|اظهر|اعرض)\s+(?:ال)?عمودي/.test(ar)) {
             return { type: "toggle", params: { element: "normal", show: true } };
         }
 
         if (t === "animate") {
             return { type: "animate", params: { from: state.h, to: 0.01, duration: 2500 } };
         }
-        if (/(?:ÙˆØ±Ù†ÙŠ|ÙˆØ±ÙŠÙ†ÙŠ|Ø§Ø±Ù†ÙŠ|Ø§Ø±ÙŠÙ†ÙŠ).*(?:Ø§Ù„Ù‚Ø§Ø·Ø¹).*(?:Ù…Ù…Ø§Ø³|Ø§Ù„Ù…Ù…Ø§Ø³)/.test(ar)) {
+        if (/(?:ورني|وريني|ارني|اريني).*(?:القاطع).*(?:مماس|المماس)/.test(ar)) {
             return { type: "animate", params: { from: state.h, to: 0.01, duration: 2500 } };
         }
 
@@ -808,15 +860,15 @@ export default function DerivativeStudioRenderer() {
             };
         }
 
-        const arabicToggle = ar.match(/^(Ø³Ø·Ø­|Ù…Ø³ØªÙˆÙ‰|Ø¹Ù…ÙˆØ¯ÙŠ)\s+(on|off|ØªØ´ØºÙŠÙ„|Ø§ÙŠÙ‚Ø§Ù|Ø¥ÙŠÙ‚Ø§Ù)$/);
+        const arabicToggle = ar.match(/^(سطح|مستوى|عمودي)\s+(on|off|تشغيل|ايقاف|إيقاف)$/);
         if (arabicToggle) {
             const token = arabicToggle[1];
-            const element = token === "Ù…Ø³ØªÙˆÙ‰" ? "plane" : token === "Ø¹Ù…ÙˆØ¯ÙŠ" ? "normal" : "surface";
+            const element = token === "مستوى" ? "plane" : token === "عمودي" ? "normal" : "surface";
             return {
                 type: "toggle",
                 params: {
                     element,
-                    show: arabicToggle[2] === "on" || arabicToggle[2] === "ØªØ´ØºÙŠÙ„"
+                    show: arabicToggle[2] === "on" || arabicToggle[2] === "تشغيل"
                 }
             };
         }
@@ -932,6 +984,48 @@ export default function DerivativeStudioRenderer() {
         });
     };
 
+    const handleCanvasViewportTransform = (payload) => {
+        if (!payload || typeof payload !== "object") return;
+        const kind = String(payload.kind || "").toLowerCase();
+
+        setState((prev) => {
+            if (prev.mode !== "2D") return prev;
+
+            if (kind === "pan") {
+                const dx = Number(payload.dx);
+                const dy = Number(payload.dy);
+                if (!Number.isFinite(dx) || !Number.isFinite(dy)) return prev;
+                return {
+                    ...prev,
+                    xRange2D: [prev.xRange2D[0] + dx, prev.xRange2D[1] + dx],
+                    yRange2D: [prev.yRange2D[0] + dy, prev.yRange2D[1] + dy]
+                };
+            }
+
+            if (kind === "zoom") {
+                const factor = Number(payload.factor);
+                const anchorX = Number(payload.anchorX);
+                const anchorY = Number(payload.anchorY);
+                if (!Number.isFinite(factor) || !Number.isFinite(anchorX) || !Number.isFinite(anchorY)) {
+                    return prev;
+                }
+
+                const nextXMin = anchorX + (prev.xRange2D[0] - anchorX) * factor;
+                const nextXMax = anchorX + (prev.xRange2D[1] - anchorX) * factor;
+                const nextYMin = anchorY + (prev.yRange2D[0] - anchorY) * factor;
+                const nextYMax = anchorY + (prev.yRange2D[1] - anchorY) * factor;
+
+                return {
+                    ...prev,
+                    xRange2D: normalizeRange(nextXMin, nextXMax, 0.4, 220),
+                    yRange2D: normalizeRange(nextYMin, nextYMax, 0.4, 220)
+                };
+            }
+
+            return prev;
+        });
+    };
+
     const handleSendMessage = async (text) => {
         const userMsg = { role: "user", content: text };
         setState((prev) => ({
@@ -986,8 +1080,19 @@ export default function DerivativeStudioRenderer() {
             return;
         }
 
+        if (isOffline()) {
+            setState((prev) => ({
+                ...prev,
+                messages: [
+                    ...prev.messages,
+                    { role: "assistant", content: "Chat needs an internet connection.", error: true }
+                ]
+            }));
+            return;
+        }
+
         try {
-            const response = await fetch("http://localhost:3002/api/interpret", {
+            const response = await fetch(apiUrl("/api/interpret"), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -1067,16 +1172,42 @@ export default function DerivativeStudioRenderer() {
         }
     };
 
+    const replayIntro = () => {
+        try {
+            window.localStorage.removeItem(INTRO_SEEN_KEY);
+        } catch {
+            // ignore storage failures
+        }
+        setShowIntro(true);
+    };
+
     return (
         <div ref={rootRef} className={`derivative-studio ${isFullscreen ? "derivative-fullscreen" : ""}`}>
+            {showIntro && (
+                <LabIntroModal
+                    labId={INTRO_LAB_ID}
+                    slides={DERIVATIVE_INTRO_SLIDES}
+                    accentColor="#f59e0b"
+                    isArabic={isArabic}
+                    onClose={() => setShowIntro(false)}
+                />
+            )}
             <div className="canvas-section derivative-canvas-section">
                 <div className="derivative-canvas-toolbar">
                     <div className="derivative-canvas-hint">
                         {state.mode === "2D"
-                            ? "Drag red/green points directly on the graph."
+                            ? "Drag red/green points, or drag empty space to pan. Use wheel to zoom."
                             : "Use mouse drag to orbit 3D view. Zoom with wheel."}
                     </div>
                     <div className="derivative-canvas-toolbar-actions">
+                        <button
+                            type="button"
+                            className="derivative-toolbar-btn"
+                            onClick={replayIntro}
+                            title={t("إعادة عرض المقدمة", "Replay Intro")}
+                        >
+                            {t("إعادة عرض المقدمة", "Replay Intro")}
+                        </button>
                         {isFullscreen && (
                             <>
                                 <button
@@ -1199,6 +1330,7 @@ export default function DerivativeStudioRenderer() {
                         functionLabel={state.func}
                         showInlineMetrics={isFullscreen}
                         onDragPoint={handleCanvasPointDrag}
+                        onViewportTransform={handleCanvasViewportTransform}
                     />
                 ) : (
                     <DerivativeCanvas3D
@@ -1261,4 +1393,3 @@ export default function DerivativeStudioRenderer() {
         </div>
     );
 }
-
